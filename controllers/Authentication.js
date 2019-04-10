@@ -16,13 +16,14 @@ function tok(user) {
 }
 
 exports.loginWithMob = (req, res, next) => {
-  // console.log('req.body az loginWithMob', req.body)
+  // console.log("req.body az loginWithMob", req.body, pnumber.toEnglishDigits(req.body.phone));
 
   if (!req.body.phone) {
     return res.status(422).send({ error: "you most send your phone number!" });
   }
 
-  let phone = Tell.phoneMobile(req.body.phone);
+  let phone = pnumber.toEnglishDigits(req.body.phone);
+  phone = Tell.phoneMobile(phone);
 
   if (phone === "number is not valid") {
     return res.status(422).send({ error: "your phone number is not ok!" });
@@ -108,6 +109,9 @@ exports.loginWithMob = (req, res, next) => {
       let respone = {};
       if (process.env.ENVIREMENT === "development") {
         respone.code = code;
+        console.log("==================");
+        console.log("your code is ", code);
+        console.log("==================");
       }
 
       if (user) {
@@ -293,10 +297,12 @@ exports.loginWithCaptcha = (req, res, next) => {
     .catch(err => res.status(422).send({ error: "we have a issue!", err }));
 };
 
-exports.acceptKey = (req, res, next) => {
-  // console.log(req.body)
-  User.findById(req.body.id)
-    .select("fcmToken authCode phone name familyName level doctor expertise pic")
+exports.acceptKey = (req, res) => {
+  console.log("==================");
+  console.log("req.body from acceptKey Authentication", req.body);
+  console.log("==================");
+  User.findOne({ phone: req.body.phone })
+    .select("fcmToken authCode phone name familyName level pic")
     .exec()
     .then(userPey => {
       if (req.body.fcmToken !== userPey.fcmToken) {
@@ -368,7 +374,7 @@ exports.removeAddressFromUser = (req, res, next) => {
   // console.log('req.user az removeAddressFromUser', req.user);
   // console.log('req.body az removeAddressFromUser', req.body);
   if (req.user) {
-    User.findByIdAndUpdate(req.user._id, { $pull: { address: { _id: req.body._id } } }, { new: true })
+    User.findOneAndUpdate({ _id: req.user._id }, { $pull: { address: { _id: req.body._id } } }, { new: true })
       .exec()
       .then(updatedUser => res.send({ user: updatedUser }))
       .catch(err => res.status(422).send({ error: "we have a issue!", err }));
@@ -448,7 +454,7 @@ exports.register = (req, res, next) => {
           });
       }
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 
   // User.findOne({email: email}, function (err, ur) {
   //   if (err) {
@@ -466,82 +472,63 @@ exports.register = (req, res, next) => {
   //       res.json({ token: tok(user), user })
   //     })
   //     .catch((err) => {
-  //       return res.status(422).send({error: 'anjam neshod', err})
+  //       return res.status(422).send({error: 'we have an issues', err})
   //     })
   // })
 };
 
-exports.users = (req, res, next) => {
-  const idm = mongoose.Types.ObjectId(req.query.id);
+exports.users = (req, res) => {
+  let query = {};
+  req.query.email ? (query = { ...query, email: { $regex: req.query.email } }) : (query = query);
+  req.query.familyName ? (query = { ...query, familyName: { $regex: req.query.familyName } }) : (query = query);
+  req.query.phone ? (query = { ...query, $where: `/${req.query.phone}.*/.test(this.phone)` }) : (query = query);
+  req.query.level ? (query = { ...query, level: { $all: req.query.level } }) : (query = query);
 
-  if (req.user.level !== "tarah" && req.user.level !== "admin") {
-    return res.status(500).send({ error: "you not have enough access right" });
-  }
-
-  User.find({ _id: { $lt: idm }, level: { $ne: "tarah" } })
+  User.find(query)
     .limit(30)
-    .sort({ _id: -1 })
     .exec()
     .then(users => res.json({ users }))
-    .catch(err => res.status(422).send({ error: "anjam neshod" }));
+    .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 
-exports.getUsersWithSearch = function(req, res, next) {
+exports.getUsersWithSearch = (req, res) => {
   // console.log('req.body az bigiKarbarhaBaSearch', req.body)
-  const query = "/" + req.body.search + "/";
 
-  if (req.user.level !== "tarah" && req.user.level !== "admin") {
-    return res.status(403).send({ error: "you not have enough access right" });
-  }
+  let query = {};
+  req.body.email ? (query = { ...query, email: { $regex: req.body.email } }) : (query = query);
+  req.body.familyName ? (query = { ...query, familyName: { $regex: req.body.familyName } }) : (query = query);
+  req.body.phone ? (query = { ...query, $where: `/${req.body.phone}.*/.test(this.phone)` }) : (query = query);
+  req.body.level ? (query = { ...query, level: req.body.level }) : (query = query);
 
-  let jostojo = {};
-  req.body.email ? Object.assign(jostojo, { email: { $regex: req.body.email } }) : (jostojo = jostojo);
-  req.body.familyName ? Object.assign(jostojo, { familyName: { $regex: req.body.familyName } }) : (jostojo = jostojo);
-  req.body.phone
-    ? Object.assign(jostojo, {
-        $where: `/${req.body.phone}.*/.test(this.phone)`
-      })
-    : (jostojo = jostojo);
-
-  User.find(jostojo)
-    .limit(100)
+  User.find(query)
+    .limit(50)
     .exec()
     .then(users => res.json({ users }))
-    .catch(err => res.status(422).send({ error: "anjam neshod" }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
-exports.getUsersWithLevel = function(req, res, next) {
+exports.getUsersWithLevel = (req, res) => {
   // console.log('req.query', req.query)
 
   User.find({ level: req.query.level })
     .exec()
     .then(users => res.json({ users }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
-exports.getDoctorUser = (req, res, next) => {
-  User.find({ doctor: true })
-    .select("name familyName pic")
-    .exec()
-    .then(users => res.json({ users }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
-};
-
-exports.editUser = function(req, res, next) {
+exports.editUser = (req, res) => {
   User.findOneAndUpdate(
     { _id: req.body._id },
     {
       name: req.body.name,
       familyName: req.body.familyName,
-      expertise: req.body.expertise,
-      doctor: req.body.doctor,
       level: req.body.level
     },
     { new: true }
   )
     .exec()
     .then(user => res.json({ user }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.editUserPass = function(req, res, next) {
@@ -605,5 +592,5 @@ exports.addUser = function(req, res, next) {
           });
       }
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };

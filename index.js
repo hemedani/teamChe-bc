@@ -43,7 +43,7 @@ const setHeader = (res, path) => {
 };
 
 app.use(
-  "/pic",
+  "/api/pic",
   serveStatic(path.join(__dirname, "pic"), {
     maxAge: "1d",
     setHeaders: setHeader

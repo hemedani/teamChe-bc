@@ -9,6 +9,7 @@ const Authentication = require("./controllers/Authentication");
 const FileController = require("./controllers/FileController");
 const CenterController = require("./controllers/CenterController");
 const CityController = require("./controllers/CityController");
+const ParishController = require("./controllers/ParishController");
 const WareTypeController = require("./controllers/WareTypeController");
 const OptionController = require("./controllers/OptionController");
 const PromotionController = require("./controllers/PromotionController");
@@ -60,7 +61,6 @@ module.exports = app => {
   app.get("/api/users", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.users);
   app.get("/api/user/getown", jsonParser, requireAuth, Authentication.getOwnUser);
   app.get("/api/users/withlevel", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.getUsersWithLevel);
-  app.get("/api/users/get/doctor", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.getDoctorUser);
   app.post("/api/user/editown", jsonParser, requireAuth, Authentication.editOwnUser);
   app.post("/api/user/add/address", jsonParser, requireAuth, Authentication.addAddressToUser);
   app.post("/api/user/remove/address", jsonParser, requireAuth, Authentication.removeAddressFromUser);
@@ -77,11 +77,7 @@ module.exports = app => {
   app.put("/api/change/option/pic", requireAuth, uploadWithExt.single("file"), FileController.changeOptionPic);
   app.put("/api/change/user/pic", requireAuth, uploadWithExt.single("file"), FileController.changeUserPic);
 
-  app.get("/api/cities", jsonParser, CityController.cities);
-  app.get("/api/yourCity", jsonParser, CityController.yourCity);
-  app.post("/api/city/add", jsonParser, requireAuth, CityController.addCity);
-  app.post("/api/city/remove", jsonParser, requireAuth, CityController.removeCity);
-
+  // ======================= {{ center Sections }} ================================================================
   app.get("/api/centers", jsonParser, CenterController.centers);
   app.get("/api/center", jsonParser, CenterController.center);
   app.get("/api/center/edited", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.getEditedCenter);
@@ -120,6 +116,16 @@ module.exports = app => {
   app.get("/api/centers/fix/office/doctors", jsonParser, CenterController.fixOfficDocters);
   app.get("/api/centers/fix/static/map", jsonParser, CenterController.fixedStaticMaps);
 
+  // ======================= {{ city Sections }} ================================================================
+  app.get("/api/cities", jsonParser, CityController.cities);
+  app.post("/api/city/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CityController.addCity);
+  app.post("/api/city/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CityController.removeCity);
+
+  // ======================= {{ parish Sections }} ================================================================
+  app.get("/api/parishes", jsonParser, ParishController.parishes);
+  app.post("/api/parish/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.addParish);
+  app.post("/api/parish/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.removeParish);
+
   // ======================= {{ rastes Sections }} ================================================================
   app.get("/api/rastes", jsonParser, RasteController.Rastes);
   app.post("/api/raste/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, RasteController.addRaste);
@@ -129,6 +135,13 @@ module.exports = app => {
   // ======================= {{ etehadiyes Sections }} ================================================================
   app.get("/api/etehadiyes", jsonParser, EtehadiyeController.Etehadiyes);
   app.post("/api/etehadiye/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.addEtehadiye);
+  app.post(
+    "/api/etehadiye/add/officer",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    EtehadiyeController.addOfficerToEtehadiye
+  );
   app.post("/api/etehadiye/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.updateEtehadiye);
   app.post("/api/etehadiye/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.removeEtehadiye);
 
@@ -141,21 +154,21 @@ module.exports = app => {
   // ======================= {{ otaghBazarganis Sections }} ================================================================
   app.get("/api/otaghBazarganis", jsonParser, OtaghBazarganiController.OtaghBazarganis);
   app.post(
-    "/otaghBazargani/add",
+    "/api/otaghBazargani/add",
     jsonParser,
     requireAuth,
     CheckLevel.ckeckAdmin,
     OtaghBazarganiController.addOtaghBazargani
   );
   app.post(
-    "/otaghBazargani/update",
+    "/api/otaghBazargani/update",
     jsonParser,
     requireAuth,
     CheckLevel.ckeckAdmin,
     OtaghBazarganiController.updateOtaghBazargani
   );
   app.post(
-    "/otaghBazargani/remove",
+    "/api/otaghBazargani/remove",
     jsonParser,
     requireAuth,
     CheckLevel.ckeckAdmin,
@@ -245,7 +258,6 @@ module.exports = app => {
 
   app.get("/api/states", jsonParser, StateController.states);
   app.post("/api/state/add", jsonParser, requireAuth, StateController.AddState);
-  app.post("/api/state/add/town", jsonParser, requireAuth, StateController.addTownToState);
   app.post("/api/state/update", jsonParser, requireAuth, StateController.updateState);
   app.post("/api/state/remove", jsonParser, requireAuth, StateController.removeState);
 

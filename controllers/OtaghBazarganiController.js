@@ -6,28 +6,40 @@ const Center = require("../models/Center");
 exports.addOtaghBazargani = (req, res, next) => {
   // console.log('req.body az addOtaghBazargani OtaghBazarganiController', req.body);
 
-  const { name, enName, city, state, pic, picRef } = req.body;
-
-  const OtaghBazargani = new OtaghBazargani({
+  let { name, enName, city, parish, state, pic, picRef, address, text, lat, lng } = req.body;
+  address.text = text;
+  const otaghBazargani = new OtaghBazargani({
     name,
     enName,
 
     city,
     state,
+    parish,
+
+    address,
+    location: { type: "Point", coordinates: [lng, lat] },
 
     pic,
     picRef,
     creator: req.user._id
   });
 
-  OtaghBazargani.save()
+  otaghBazargani
+    .save()
     .then(OtaghBazarganiSaved => res.json({ OtaghBazargani: OtaghBazarganiSaved }))
     .catch(err => res.status(422).send({ error: "anjam neshod", err }));
 };
 
 exports.OtaghBazarganis = (req, res) => {
-  OtaghBazargani.find()
-    .select("name enName pic")
+  let query = {};
+  if (req.query.stateId) {
+    query.state = req.query.stateId;
+  }
+  if (req.query.cityId) {
+    query.city = req.query.cityId;
+  }
+  OtaghBazargani.find(query)
+    // .select("name enName pic")
     .exec()
     .then(OtaghBazarganis => res.json({ OtaghBazarganis }))
     .catch(err => res.status(422).send({ error: "anjam neshod", err }));
@@ -74,33 +86,9 @@ exports.updateOtaghBazargani = (req, res) => {
 
 exports.removeOtaghBazargani = (req, res) => {
   // console.log('req.body az removeOtaghBazargani :', req.body);
-  OtaghBazargani.findByIdAndRemove(req.body._id)
+  OtaghBazargani.findOneAndDelete(req.body._id)
     .exec()
-    .then(removedOtaghBazargani => {
-      console.log(removedOtaghBazargani);
-
-      Center.find({ OtaghBazarganisRef: removedOtaghBazargani._id })
-        .exec()
-        .then(CenterFinded => {
-          // let Centers = CenterFinded._doc;
-          // console.log('az to Center.find updateOtaghBazargani', Centers);
-          if (CenterFinded.length > 0) {
-            Promise.all(
-              CenterFinded.map(Center => {
-                Center.OtaghBazarganisEnName = Center.OtaghBazarganisEnName.filter(
-                  en => en !== removedOtaghBazargani.enName
-                );
-                Center.OtaghBazarganis = Center.OtaghBazarganis.filter(ct => ct.enName !== removedOtaghBazargani.enName);
-                Center.OtaghBazarganisRef.remove(removedOtaghBazargani._id);
-
-                return Center.save().then(CenterSaved => CenterSaved);
-              })
-            ).then(resp => res.json({ OtaghBazargani: removedOtaghBazargani, CenterLength: resp.length }));
-          } else {
-            return res.json({ OtaghBazargani: removedOtaghBazargani, CenterLength: 0 });
-          }
-        });
-    })
+    .then(removedOtaghBazargani => res.json({ otaghBazargani: removedOtaghBazargani }))
     .catch(err => {
       return res.status(422).send({ error: "anjam neshod" });
     });

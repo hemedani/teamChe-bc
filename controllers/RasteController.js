@@ -4,38 +4,33 @@ const User = require("../models/user");
 const Raste = require("../models/Raste");
 const Center = require("../models/Center");
 
-exports.addRaste = (req, res, next) => {
+exports.addRaste = (req, res) => {
   // console.log('req.body az addRaste RasteController', req.body);
 
-  const { name, enName, etehadiye, otaghAsnaf, otaghBazargani, city, state, pic, picRef } = req.body;
+  const { name, enName, pic, picRef, etehadiye } = req.body;
 
-  const Raste = new Raste({
+  const raste = new Raste({
     name,
     enName,
 
     etehadiye,
-    otaghAsnaf,
-    otaghBazargani,
-
-    city,
-    state,
 
     pic,
     picRef,
     creator: req.user._id
   });
 
-  Raste.save()
+  raste
+    .save()
     .then(RasteSaved => res.json({ Raste: RasteSaved }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "We have an issues", err }));
 };
 
 exports.Rastes = (req, res) => {
   Raste.find()
-    .select("name enName pic")
     .exec()
     .then(Rastes => res.json({ Rastes }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "We have an issues", err }));
 };
 
 exports.updateRaste = (req, res) => {
@@ -79,30 +74,6 @@ exports.removeRaste = (req, res) => {
   // console.log('req.body az removeRaste :', req.body);
   Raste.findByIdAndRemove(req.body._id)
     .exec()
-    .then(removedRaste => {
-      console.log(removedRaste);
-
-      Center.find({ RastesRef: removedRaste._id })
-        .exec()
-        .then(CenterFinded => {
-          // let Centers = CenterFinded._doc;
-          // console.log('az to Center.find updateRaste', Centers);
-          if (CenterFinded.length > 0) {
-            Promise.all(
-              CenterFinded.map(Center => {
-                Center.RastesEnName = Center.RastesEnName.filter(en => en !== removedRaste.enName);
-                Center.Rastes = Center.Rastes.filter(ct => ct.enName !== removedRaste.enName);
-                Center.RastesRef.remove(removedRaste._id);
-
-                return Center.save().then(CenterSaved => CenterSaved);
-              })
-            ).then(resp => res.json({ Raste: removedRaste, CenterLength: resp.length }));
-          } else {
-            return res.json({ Raste: removedRaste, CenterLength: 0 });
-          }
-        });
-    })
-    .catch(err => {
-      return res.status(422).send({ error: "anjam neshod" });
-    });
+    .then(removedRaste => res.json({ raste: removedRaste }))
+    .catch(err => res.status(422).send({ error: "We have an issues", err }));
 };

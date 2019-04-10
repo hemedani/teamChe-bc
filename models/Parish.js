@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const StateSchema = new Schema(
+const ParishSchema = new Schema(
   {
     name: String,
     enName: String,
-    cities: [{ type: Schema.Types.ObjectId, ref: "City" }],
+    state: { type: Schema.Types.ObjectId, ref: "State" },
+    city: { type: Schema.Types.ObjectId, ref: "City" },
     location: { type: { type: String }, coordinates: [Number] },
     polygon: { type: { type: String }, coordinates: [Array] },
     creator: { type: Schema.Types.ObjectId, ref: "User" }
@@ -13,6 +14,6 @@ const StateSchema = new Schema(
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
 
-const ModelClass = mongoose.model("State", StateSchema);
+const ModelClass = mongoose.model("Parish", ParishSchema);
 
 module.exports = ModelClass;

@@ -1,7 +1,12 @@
+const _ = require("lodash");
 exports.ckeckAdmin = (req, res, next) => {
-  if (req.user.level !== 'tarah' && req.user.level !== 'admin') {
-    return res.status(500).send({ error: 'you not have enough access right' })
-  } else {
+  // console.log("==================");
+  // console.log("req.user CheckLeve.ckeckAdmin ", req.user);
+  // console.log("==================");
+
+  if (_.includes(req.user.level, "tarah") || _.includes(req.user.level, "admin")) {
     next();
+  } else {
+    return res.status(500).send({ error: "you not have enough access right" });
   }
-}
+};

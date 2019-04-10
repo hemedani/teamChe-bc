@@ -30,7 +30,7 @@ const CenterSchema = new Schema(
 
     wares: [{ type: Schema.Types.ObjectId, ref: "Ware" }],
 
-    address: String,
+    address: { state: String, city: String, parish: String, text: String },
 
     premium: { type: Boolean, default: false },
     onlineShop: { type: Boolean, default: false },

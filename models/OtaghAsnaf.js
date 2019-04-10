@@ -10,10 +10,14 @@ const OtaghAsnafSchema = new Schema(
 
     city: { type: Schema.Types.ObjectId, ref: "City" },
     state: { type: Schema.Types.ObjectId, ref: "State" },
+    parish: { type: Schema.Types.ObjectId, ref: "Parish" },
 
     etehadiyeha: [{ type: Schema.Types.ObjectId, ref: "Etehadiye" }],
     rasteha: [{ type: Schema.Types.ObjectId, ref: "Raste" }],
     senfha: [{ type: Schema.Types.ObjectId, ref: "Senf" }],
+
+    address: { state: String, city: String, parish: String, text: String },
+    location: { type: { type: String }, coordinates: [Number] },
 
     pic: String,
     picRef: { type: Schema.Types.ObjectId, ref: "File" },

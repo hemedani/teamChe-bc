@@ -6,9 +6,10 @@ const Center = require("../models/Center");
 exports.addOtaghAsnaf = (req, res, next) => {
   // console.log('req.body az addOtaghAsnaf OtaghAsnafController', req.body);
 
-  const { name, enName, otaghBazargani, city, state, pic, picRef } = req.body;
+  let { name, enName, otaghBazargani, city, parish, state, pic, picRef, address, text, lat, lng } = req.body;
+  address.text = text;
 
-  const OtaghAsnaf = new OtaghAsnaf({
+  const otaghAsnaf = new OtaghAsnaf({
     name,
     enName,
 
@@ -16,20 +17,25 @@ exports.addOtaghAsnaf = (req, res, next) => {
 
     city,
     state,
+    parish,
+
+    address,
+    location: { type: "Point", coordinates: [lng, lat] },
 
     pic,
     picRef,
     creator: req.user._id
   });
 
-  OtaghAsnaf.save()
+  otaghAsnaf
+    .save()
     .then(OtaghAsnafSaved => res.json({ OtaghAsnaf: OtaghAsnafSaved }))
     .catch(err => res.status(422).send({ error: "anjam neshod", err }));
 };
 
 exports.OtaghAsnafs = (req, res) => {
   OtaghAsnaf.find()
-    .select("name enName pic")
+    // .select("name enName pic")
     .exec()
     .then(OtaghAsnafs => res.json({ OtaghAsnafs }))
     .catch(err => res.status(422).send({ error: "anjam neshod", err }));
@@ -74,31 +80,9 @@ exports.updateOtaghAsnaf = (req, res) => {
 
 exports.removeOtaghAsnaf = (req, res) => {
   // console.log('req.body az removeOtaghAsnaf :', req.body);
-  OtaghAsnaf.findByIdAndRemove(req.body._id)
+  OtaghAsnaf.findOneAndDelete(req.body._id)
     .exec()
-    .then(removedOtaghAsnaf => {
-      console.log(removedOtaghAsnaf);
-
-      Center.find({ OtaghAsnafsRef: removedOtaghAsnaf._id })
-        .exec()
-        .then(CenterFinded => {
-          // let Centers = CenterFinded._doc;
-          // console.log('az to Center.find updateOtaghAsnaf', Centers);
-          if (CenterFinded.length > 0) {
-            Promise.all(
-              CenterFinded.map(Center => {
-                Center.OtaghAsnafsEnName = Center.OtaghAsnafsEnName.filter(en => en !== removedOtaghAsnaf.enName);
-                Center.OtaghAsnafs = Center.OtaghAsnafs.filter(ct => ct.enName !== removedOtaghAsnaf.enName);
-                Center.OtaghAsnafsRef.remove(removedOtaghAsnaf._id);
-
-                return Center.save().then(CenterSaved => CenterSaved);
-              })
-            ).then(resp => res.json({ OtaghAsnaf: removedOtaghAsnaf, CenterLength: resp.length }));
-          } else {
-            return res.json({ OtaghAsnaf: removedOtaghAsnaf, CenterLength: 0 });
-          }
-        });
-    })
+    .then(removedOtaghAsnaf => res.json({ otaghAsnaf: removedOtaghAsnaf }))
     .catch(err => {
       return res.status(422).send({ error: "anjam neshod" });
     });

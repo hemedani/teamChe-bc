@@ -5,19 +5,26 @@ const EtehadiyeSchema = new Schema(
   {
     name: String,
     enName: String,
+    code: Number,
+
     otaghAsnaf: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },
     otaghBazargani: { type: Schema.Types.ObjectId, ref: "OtaghBazargani" },
 
     city: { type: Schema.Types.ObjectId, ref: "City" },
     state: { type: Schema.Types.ObjectId, ref: "State" },
+    parish: { type: Schema.Types.ObjectId, ref: "Parish" },
 
     rasteha: [{ type: Schema.Types.ObjectId, ref: "Raste" }],
     senfha: [{ type: Schema.Types.ObjectId, ref: "Senf" }],
 
+    address: { state: String, city: String, parish: String, text: String },
+    location: { type: { type: String }, coordinates: [Number] },
+
     pic: String,
     picRef: { type: Schema.Types.ObjectId, ref: "File" },
 
-    creator: { type: Schema.Types.ObjectId, ref: "User" }
+    creator: { type: Schema.Types.ObjectId, ref: "User" },
+    officers: [{ type: Schema.Types.ObjectId, ref: "User" }]
   },
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );

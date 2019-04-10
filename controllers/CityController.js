@@ -1,60 +1,39 @@
-const mongoose = require('mongoose');
-var _ = require('lodash');
-const City = require('../models/City');
+const mongoose = require("mongoose");
+const City = require("../models/City");
 
-exports.addCity = ( req, res, next ) => {
-
-  // console.log('req.body az addCity CityController', req.body);
-
+exports.addCity = (req, res) => {
+  const { name, enName, state, lat, lng, polygon } = req.body;
   const city = new City({
-    name: req.body.name,
-    enName: req.body.enName,
-    location: { type: 'Point', coordinates: [req.body.lng, req.body.lat] },
-    latD: req.body.latD,
-    lngD: req.body.lngD,
-    creator: req.user._id,
-    polygon: { type: 'Polygon', coordinates: req.body.polygon }
+    name: name,
+    enName: enName,
+    state: state,
+    location: { type: "Point", coordinates: [lng, lat] },
+    polygon,
+    creator: req.user._id
   });
 
-  city.save()
-    .then((citySaved) => res.json({ city }))
-    .catch((err) => res.status(422).send({error: 'anjam neshod'}))
-}
+  city
+    .save()
+    .then(citySaved => res.json({ city: citySaved }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
 
-exports.cities = (req, res, next) => {
+exports.cities = (req, res) => {
+  let query = {};
+  if (req.query.state) {
+    query.state = req.query.state;
+  }
 
-  City.find()
+  City.find(query)
     .exec()
-    .then((cities) => {
-      return res.json({ cities });
-    })
-    .catch((err) => {
-      return res.status(422).send({error: 'anjam neshod'});
-    })
-}
+    .then(cities => res.json({ cities }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
 
-exports.yourCity = (req, res, next) => {
-
-  // console.log('req.query az yourCity', req.query)
-
-  City.findById(req.query.cityid)
-    .exec( (err, city) => {
-    if (err) {
-      return res.status(422).send({error: 'anjam neshod'});
-    }
-    // console.log('city az yourCity', city);
-    return res.json({ city });
-  })
-}
-
-exports.removeCity = (req, res, next) => {
+exports.removeCity = (req, res) => {
   // console.log('req.body az removeCity :', req.body);
-  City.findByIdAndRemove(req.body.id)
+  City.findByIdAndRemove(req.body._id)
     .exec()
-    .then((err) => {
-      return res.send('ba movafghiyat hazf shod');
-    })
-    .catch((err) => {
-      return res.status(422).send({error: 'anjam neshod'});
-    })
-}
+    .then(city => res.send({ msg: "removed succesfully", city }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
