@@ -55,7 +55,7 @@ app.use(
 //   console.log(mime.lookup(path));
 // }
 
-// app.use(cors());
+app.use(cors());
 
 const port = process.env.PORT || 1367;
 const server = http.createServer(app);
