@@ -45,6 +45,9 @@ exports.inspection = (req, res) => {
       console.log("==================");
       console.log("inspection after seend", inspection);
       console.log("==================");
+      console.log("==================");
+      console.log("just for test", inspection);
+      console.log("==================");
 
       inspection.save().then(savedInpection => res.send({ inspection: savedInpection }));
     })
