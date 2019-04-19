@@ -13,85 +13,12 @@ const exRate = require("../service/exRate").exRate;
 const download = require("image-downloader");
 const uuidv4 = require("uuid/v4");
 
-exports.addCenter = (req, res) => {
+exports.addCenter = async (req, res) => {
   // Incom :: Method : post ---- need( in req.body) :
   // Ooutput :: Method: json ---- { center: {'---refer to it's model for props---'} }
 
-  // let options = req.body.options || [], optionsEnName = [], optionsRef = [],
-  //     wareTypes = req.body.wareTypes || [], wareTypesEnName = [], wareTypesRef = [],
-  //     rastes = req.body.rastes || [], rastesEnName = [], rastesRef = [],
-  //     labels = req.body.labels || [], labelsEnName = [], labelsRef = [],
-  //     picsUploaded = req.body.picsUploaded || [], pic = [], picRef = [];
-
-  // options.map((option) => { optionsEnName.push(option.enName); optionsRef.push(option._id) })
-  // wareTypes.map((wareType) => { wareTypesEnName.push(wareType.enName); wareTypesRef.push(wareType._id) })
-  // rastes.map((raste) => { rastesEnName.push(raste.enName); rastesRef.push(raste._id) })
-  // labels.map((label) => { labelsEnName.push(label.enName); labelsRef.push(label._id) })
-  // picsUploaded.map((pi) => { pic.push(pi.name); picRef.push(pi._id) })
-
-  // let center = new Center({
-  //   name: req.body.name,
-  //   enName: req.body.enName,
-  //   cityName: req.body.city.enName,
-  //   description: req.body.description,
-
-  //   telegram: req.body.telegram,
-  //   instagram: req.body.instagram,
-  //   email: req.body.email,
-  //   website: req.body.website,
-
-  //   options: options || [],
-  //   wareTypes: wareTypes || [],
-  //   rastes: rastes || [],
-  //   labels: labels || [],
-
-  //   optionsEnName: optionsEnName || [],
-  //   wareTypesEnName: wareTypesEnName || [],
-  //   rastesEnName: rastesEnName || [],
-  //   labelsEnName: labelsEnName || [],
-
-  //   optionsRef: optionsRef || [],
-  //   wareTypesRef: wareTypesRef || [],
-  //   rastesRef: rastesRef || [],
-  //   labelsRef: labelsRef || [],
-
-  //   discount: req.body.discount || 0,
-  //   phone: req.body.phone || [],
-  //   onlineShop: req.body.onlineShop || false,
-  //   pic: pic,
-  //   picRef: picRef,
-  //   premium: req.body.premium || false,
-  //   address: req.body.address || '',
-  //   city: { name: req.body.city.name, enName: req.body.city.enName, location: req.body.city.location },
-  //   cityRef: req.body.city._id,
-  //   location: { type: 'Point', coordinates: [req.body.lng, req.body.lat] },
-  //   creator: req.user._id
-  // });
-
-  // if (req.body.startWork && req.body.endWork) {
-  //   center.workShift = [req.body.startWork, req.body.endWork]
-  // }
-
-  // if (req.body.user) center.doctor = req.body.user;
-
-  // const staticMapImgName = `${uuidv4()}.png`
-
-  // const mapOptions = {
-  //   url: `https://maps.googleapis.com/maps/api/staticmap?language=fa&center=${req.body.lat},${req.body.lng}&zoom=16&size=640x400&maptype=roadmap&markers=icon:https://pinteb.ir/static/img/pin.png%7C${req.body.lat},${req.body.lng}&key=AIzaSyCPfDQXNU5sl3Ar7gfy-CSbWijyHJ2mjrY`,
-  //   dest: `./pic/maps/${staticMapImgName}`
-  // }
-
-  // download.image(mapOptions)
-  //   .then(({ filename, image }) => {
-  //     center.staticMap = staticMapImgName;
-
-  //     center.save()
-  //       .then((centerSaved) => res.json({ center: centerSaved }))
-  //   })
-  //   .catch((err) => res.status(422).send({error: 'anjam neshod', err}))picsUploaded.map((pi) => { pic.push(pi.name); picRef.push(pi._id) })
-
   console.log("==================");
-  console.log("req.body from CenterController", req.body);
+  console.log("req.body from CenterController addCenter", req.body);
   console.log("==================");
 
   let {
@@ -106,6 +33,7 @@ exports.addCenter = (req, res) => {
     instagram,
     email,
     website,
+    phone,
 
     text,
 
@@ -146,6 +74,7 @@ exports.addCenter = (req, res) => {
     instagram,
     email,
     website,
+    phone,
 
     state,
     city,
@@ -166,6 +95,24 @@ exports.addCenter = (req, res) => {
   if (startWork && endWork) {
     center.workShift = [startWork, endWork];
   }
+
+  const staticMapImgName = `${uuidv4()}.png`;
+
+  const mapOptions = {
+    url: `https://maps.googleapis.com/maps/api/staticmap?language=fa&center=${req.body.lat},${
+      req.body.lng
+    }&zoom=16&size=640x400&maptype=roadmap&markers=icon:https://pasteboard.co/IagJJEM.png%7C${req.body.lat},${
+      req.body.lng
+    }&key=AIzaSyCPfDQXNU5sl3Ar7gfy-CSbWijyHJ2mjrY`,
+    dest: `./pic/maps/${staticMapImgName}`
+  };
+
+  await download.image(mapOptions);
+  center.staticMap = staticMapImgName;
+
+  console.log("==================");
+  console.log("center before saved", center);
+  console.log("==================");
 
   center
     .save()
@@ -199,10 +146,6 @@ exports.CentersCount = async (req, res) => {
 
 exports.updateCenter = (req, res, next) => {
   // console.log('req.body az updateCenter CenterController', req.body);
-
-  if (req.user.level !== "tarah" && req.user.level !== "admin") {
-    return res.status(500).send({ error: "you not have enough access right" });
-  }
 
   let options = req.body.options || [],
     optionsEnName = [],
@@ -276,7 +219,7 @@ exports.updateCenter = (req, res, next) => {
   )
     .exec()
     .then(center => res.json({ center }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.centers = (req, res, next) => {
@@ -315,14 +258,8 @@ exports.centers = (req, res, next) => {
     .limit(30)
     .sort({ _id: -1 })
     .exec()
-    .then(centers => {
-      console.log("==================");
-      console.log("centers", centers);
-      console.log("==================");
-
-      return res.json({ centers });
-    })
-    .catch(err => res.status(422).send({ error: "anjam neshod" }));
+    .then(centers => res.json({ centers }))
+    .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 
 exports.getCentersWithParams = function(req, res, next) {
@@ -370,7 +307,7 @@ exports.getCentersWithParams = function(req, res, next) {
       )
       .exec()
       .then(centers => res.json({ centers }))
-      .catch(err => res.status(422).send({ error: "anjam neshod" }));
+      .catch(err => res.status(422).send({ error: "we have an issues" }));
   } else if (req.query.sort) {
     let sort = {};
     let query = {};
@@ -415,7 +352,7 @@ exports.getCentersWithParams = function(req, res, next) {
             .then(city => res.json({ centers, city }));
         }
       })
-      .catch(err => res.status(422).send({ error: "anjam neshod" }));
+      .catch(err => res.status(422).send({ error: "we have an issues" }));
   } else {
     // console.log(req.query.rastes)
 
@@ -462,19 +399,15 @@ exports.getCentersWithParams = function(req, res, next) {
             .then(city => res.json({ centers, city }));
         }
       })
-      .catch(err => res.status(422).send({ error: "anjam neshod" }));
+      .catch(err => res.status(422).send({ error: "we have an issues" }));
   }
 };
 
-exports.center = (req, res, next) => {
+exports.center = (req, res) => {
   // console.log('req.query az exports.center', req.query)
   // console.log('req.headers az exports.center', req.headers)
 
-  Center.findById(req.query.id)
-    .populate("doctor")
-    .select(
-      "name enName cityName description telegram instagram email website workShift expertRate likes phone discount TotalQualityRate TotalPeopleRate TotalPriceRate TotalSalesmanRate options wareTypes rastes labels address premium onlineShop pic staticMap location officeDoctors otherAdresses"
-    )
+  Center.findById(req.query._id)
     .exec()
     .then(center => {
       let editCenter = Object.assign({ hasLiked: false }, center._doc);
@@ -493,7 +426,7 @@ exports.center = (req, res, next) => {
         return res.json({ center: editCenter });
       }
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod" }));
+    .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 
 exports.getEditedCenter = (req, res, next) => {
@@ -503,7 +436,7 @@ exports.getEditedCenter = (req, res, next) => {
   Center.findById(req.query.centerId)
     .exec()
     .then(center => res.json({ center }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.addQualityRate = function(req, res, next) {
@@ -643,7 +576,7 @@ exports.addQualityRate = function(req, res, next) {
           });
       }
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod" }));
+    .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 
 exports.addPriceRate = (req, res, next) => {
@@ -781,7 +714,7 @@ exports.addPriceRate = (req, res, next) => {
     })
     .catch(err => {
       // console.log('oftad to error', err);
-      return res.status(422).send({ error: "anjam neshod" });
+      return res.status(422).send({ error: "we have an issues" });
     });
 };
 
@@ -921,7 +854,7 @@ exports.addSalesmanRate = (req, res, next) => {
     })
     .catch(err => {
       // console.log('oftad to error', err);
-      return res.status(422).send({ error: "anjam neshod" });
+      return res.status(422).send({ error: "we have an issues" });
     });
 };
 
@@ -930,7 +863,7 @@ exports.setExpertRate = (req, res, next) => {
   Center.findByIdAndUpdate({ _id: req.body.id }, { expertRate: rate }, { new: true })
     .exec()
     .then(centerUpdated => res.json({ center: centerUpdated }))
-    .catch(err => res.status(422).send({ error: "anjam neshod" }));
+    .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 
 exports.addOptions = (req, res, next) => {
@@ -960,7 +893,7 @@ exports.addOptions = (req, res, next) => {
   )
     .exec()
     .then(centerUpdated => res.json({ center: centerUpdated }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.setOtherAddresses = (req, res, next) => {
@@ -988,78 +921,14 @@ exports.setOtherAddresses = (req, res, next) => {
         .exec()
         .then(center => res.json({ center }));
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.removeAOtherAddFromCenter = (req, res, next) => {
   Center.findByIdAndUpdate({ _id: req.body.centerId }, { $pull: { otherAdresses: { _id: req.body.addId } } }, { new: true })
     .exec()
     .then(centerUpdated => res.send({ center: centerUpdated }))
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
-};
-
-exports.setDoctor = (req, res, next) => {
-  Center.findByIdAndUpdate({ _id: req.body.centerId }, { doctor: req.body.userId })
-    .exec()
-    .then(centerUpdated => {
-      Center.findById(req.body.centerId)
-        .populate("doctor")
-        .select(
-          "name enName cityName workShift expertRate likes phone discount TotalQualityRate TotalPeopleRate TotalPriceRate TotalSalesmanRate options wareTypes rastes labels address premium onlineShop description pic location officeDoctors otherAdresses"
-        )
-        .exec()
-        .then(center => res.json({ center }));
-    })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
-};
-
-exports.setOfficeDoctors = (req, res, next) => {
-  // console.log('req.body setOfficeDoctors', req.body)
-  let officeDoctors = req.body.officeDoctors || [],
-    officeDoctorsRef = [];
-  officeDoctors.map(ofdrs => officeDoctorsRef.push(ofdrs._id));
-
-  Center.findByIdAndUpdate(
-    { _id: req.body.centerId },
-    { $push: { officeDoctors: { $each: officeDoctors }, officeDoctorsRef: { $each: officeDoctorsRef } } }
-  )
-    .exec()
-    .then(centerUpdated => {
-      Center.findById(req.body.centerId)
-        .populate("doctor")
-        .select(
-          "name enName cityName workShift expertRate likes phone discount TotalQualityRate TotalPeopleRate TotalPriceRate TotalSalesmanRate options wareTypes rastes labels address premium onlineShop description pic location officeDoctors otherAdresses"
-        )
-        .exec()
-        .then(center => res.json({ center }));
-    })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
-};
-
-exports.deleteDoctor = (req, res, next) => {
-  Center.findByIdAndUpdate({ _id: req.body.centerId }, { doctor: null }, { new: true })
-    .exec()
-    .then(centerUpdated => {
-      let center = centerUpdated._doc;
-
-      delete center.optionsEnName;
-      delete center.wareTypesEnName;
-      delete center.rastesEnName;
-      delete center.labelsEnName;
-
-      delete center.wareTypesRef;
-      delete center.rastesRef;
-      delete center.optionsRef;
-      delete center.labelsRef;
-
-      delete center.picRef;
-      delete center.creator;
-      delete center.rateRef;
-      delete center.cityRef;
-
-      return res.json({ center });
-    })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.setCenterLikes = (req, res, next) => {
@@ -1087,7 +956,7 @@ exports.setCenterLikes = (req, res, next) => {
           return res.json({ center: editCenter, user: userUpd });
         });
       })
-      .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+      .catch(err => res.status(422).send({ error: "we have an issues", err }));
   } else {
     User.findByIdAndUpdate(req.user._id, { $push: { centersLiked: centerId } }, { new: true })
       .exec()
@@ -1099,7 +968,7 @@ exports.setCenterLikes = (req, res, next) => {
           return res.json({ center: editCenter, user: userUpd });
         });
       })
-      .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+      .catch(err => res.status(422).send({ error: "we have an issues", err }));
   }
 };
 
@@ -1118,7 +987,7 @@ exports.setOwner = (req, res, next) => {
             .then(center => res.json({ center }));
         });
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.removeCenter = (req, res, next) => {
@@ -1135,30 +1004,40 @@ exports.removeCenter = (req, res, next) => {
       });
       return res.send("ba movafghiyat hazf shod");
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod" }));
+    .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 
-exports.addPicToCenter = (req, res, next) => {
-  // console.log(req.body)
+exports.addPicToCenter = (req, res) => {
+  // console.log(req.body);
   Center.findById(req.body._id)
     .exec()
     .then(centerFind => {
       let picsUploaded = req.body.picsUploaded || [],
-        pic = [],
-        picRef = [],
-        oldPic = centerFind.pic || [],
-        oldPicRef = centerFind.picRef || [];
+        pics = [],
+        picsRef = [],
+        oldPics = centerFind.pics || [],
+        oldPicsRef = centerFind.picsRef || [];
 
       picsUploaded.map(pi => {
-        pic.push(pi.name);
-        picRef.push(pi._id);
+        pics.push(pi.name);
+        picsRef.push(pi._id);
       });
-      centerFind.pic = [...oldPic, ...pic];
-      centerFind.picRef = [...oldPicRef, ...picRef];
+      centerFind.pics = [...oldPics, ...pics];
+      centerFind.picsRef = [...oldPicsRef, ...picsRef];
 
       centerFind.save().then(centerSaved => res.json({ center: centerSaved }));
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
+
+exports.addLicensPic = (req, res) => {
+  // console.log(req.body);
+  const { _id, licensePic, licensePicRef } = req.body;
+
+  Center.findOneAndUpdate({ _id }, { licensePic, licensePicRef }, { new: true })
+    .exec()
+    .then(center => res.json({ center }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.deletePicCenter = (req, res, next) => {
@@ -1178,7 +1057,7 @@ exports.deletePicCenter = (req, res, next) => {
 
       // return res.json({ center: centerFind })
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.fixOfficDocters = (req, res, next) => {
@@ -1220,7 +1099,7 @@ exports.fixOfficDocters = (req, res, next) => {
         return res.json(resp.length);
       });
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.fixedStaticMaps = async (req, res) => {
@@ -1232,7 +1111,7 @@ exports.fixedStaticMaps = async (req, res) => {
     .skip(limit * page)
     .limit(limit)
     .exec()
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 
   const cnmap = await Promise.all(
     centers.map(async center => {
@@ -1248,7 +1127,7 @@ exports.fixedStaticMaps = async (req, res) => {
       };
       const downloadedMap = await download
         .image(mapOptions)
-        .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+        .catch(err => res.status(422).send({ error: "we have an issues", err }));
       center.staticMap = staticMapImgName;
       const savedCenter = await center.save();
 
@@ -1295,7 +1174,7 @@ exports.fixedStaticMaps = async (req, res) => {
 //       })
 
 //     })
-//     .catch((err) => res.status(422).send({error: 'anjam neshod', err}))
+//     .catch((err) => res.status(422).send({error: 'we have an issues', err}))
 // }
 
 exports.fixOtherAddressId = (req, res, next) => {
@@ -1320,5 +1199,5 @@ exports.fixOtherAddressId = (req, res, next) => {
       );
       return res.send({ centerFixed, centerFixedLength: centerFixed.length });
     })
-    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };

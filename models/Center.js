@@ -39,6 +39,11 @@ const CenterSchema = new Schema(
     pics: [String],
     picsRef: [{ type: Schema.Types.ObjectId, ref: "File" }],
 
+    staticMap: String,
+
+    licensePic: String,
+    licensePicRef: { type: Schema.Types.ObjectId, ref: "File" },
+
     creator: { type: Schema.Types.ObjectId, ref: "User" },
     owner: { type: Schema.Types.ObjectId, ref: "User" },
 

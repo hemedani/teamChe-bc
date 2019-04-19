@@ -12,6 +12,7 @@ const CityController = require("./controllers/CityController");
 const ParishController = require("./controllers/ParishController");
 const WareTypeController = require("./controllers/WareTypeController");
 const OptionController = require("./controllers/OptionController");
+const InspectionController = require("./controllers/InspectionController");
 const PromotionController = require("./controllers/PromotionController");
 const WareOptionController = require("./controllers/WareOptionController");
 const RateController = require("./controllers/RateController");
@@ -91,15 +92,6 @@ module.exports = app => {
   app.post("/api/center/addpricerate", jsonParser, requireAuth, CenterController.addPriceRate);
   app.post("/api/center/addsalesmanrate", jsonParser, requireAuth, CenterController.addSalesmanRate);
   app.post("/api/center/addoptiontocenter", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addOptions);
-  app.post("/api/center/set/doctor", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.setDoctor);
-  app.post(
-    "/api/center/set/officedoctors",
-    jsonParser,
-    requireAuth,
-    CheckLevel.ckeckAdmin,
-    CenterController.setOfficeDoctors
-  );
-  app.post("/api/center/delete/doctor", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.deleteDoctor);
   app.post("/api/center/set/address", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.setOtherAddresses);
   app.post("/api/center/set/owner", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.setOwner);
   app.post("/api/center/set/like", jsonParser, requireAuth, CenterController.setCenterLikes);
@@ -188,6 +180,11 @@ module.exports = app => {
   app.post("/api/ware/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, WareController.addWare);
   app.post("/api/ware/edit", jsonParser, requireAuth, CheckLevel.ckeckAdmin, WareController.updateWare);
   app.post("/api/ware/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, WareController.removeWare);
+
+  // ======================= {{ Inspection Sections }} ================================================================
+  app.post("/api/inspection/add", jsonParser, requireAuth, CheckLevel.checkOfficer, InspectionController.addInspection);
+  app.get("/api/inspection/inspections", jsonParser, requireAuth, CheckLevel.checkOfficer, InspectionController.inspections);
+  app.get("/api/inspection/inspection", jsonParser, requireAuth, CheckLevel.checkOfficer, InspectionController.inspection);
 
   // ======================= {{ Options Sections }} ================================================================
   app.get("/api/options", jsonParser, OptionController.options);
