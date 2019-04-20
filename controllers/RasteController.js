@@ -7,7 +7,7 @@ const Center = require("../models/Center");
 exports.addRaste = (req, res) => {
   // console.log('req.body az addRaste RasteController', req.body);
 
-  const { name, enName, pic, picRef, etehadiye } = req.body;
+  const { name, enName, etehadiye } = req.body;
 
   const raste = new Raste({
     name,
@@ -15,8 +15,6 @@ exports.addRaste = (req, res) => {
 
     etehadiye,
 
-    pic,
-    picRef,
     creator: req.user._id
   });
 
