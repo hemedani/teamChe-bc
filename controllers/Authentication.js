@@ -51,7 +51,7 @@ exports.loginWithMob = (req, res) => {
       if (process.env.ENVIREMENT === "production") {
         axios
           .get(`http://37.130.202.188/class/sms/webservice/send_url.php`, {
-            params: { from: "+98100020400", to: phone, msg: sms, uname: 09184424686, pass: 9184424686 }
+            params: { from: "+98100020400", to: `+${phone}`, msg: sms, uname: "09184424686", pass: "9184424686" }
           })
           .then(resp => {
             respSms = resp.data;
@@ -149,10 +149,10 @@ exports.loginWithCaptcha = (req, res, next) => {
 
       if (process.env.ENVIREMENT === "production") {
         axios
-          .get(`http://login.parsgreen.com/UrlService/sendSMS.ashx`, {
-            params: { signature: "7342FB7C-75FD-42B7-9DCE-938B12CBB0CB", from: "10001393", to: phone, text: sms }
+          .get(`http://37.130.202.188/class/sms/webservice/send_url.php`, {
+            params: { from: "+98100020400", to: `+${phone}`, msg: sms, uname: "09184424686", pass: "9184424686" }
           })
-          .then(resp => resp.data);
+          .then(resp => (respSms = resp.data));
       }
 
       let codeShomareTimeOut = null;
