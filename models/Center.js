@@ -39,6 +39,8 @@ const CenterSchema = new Schema(
     pics: [String],
     picsRef: [{ type: Schema.Types.ObjectId, ref: "File" }],
 
+    etPic: String,
+
     staticMap: String,
 
     licensePic: String,

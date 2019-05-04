@@ -36,71 +36,26 @@ exports.loginWithMob = (req, res) => {
       const sms = "با سلام، کد شما در تیم چه : " + code;
 
       let respSms = null;
-      // axios.get(`http://37.130.202.188/class/sms/webservice/send_url.php?from=10001833181833&to=${ phone }&msg=${ sms }&uname=mohamad1390&pass=88410383`)
-      //   .then((resp) => {
-      //     respSms = resp.data
+
+      // axios
+      //   .get(`http://37.130.202.188/class/sms/webservice/send_url.php`, {
+      //     params: { from: "+98100020400", to: `+${phone}`, msg: sms, uname: "09184424686", pass: "9184424686" }
       //   })
+      //   .then(resp => {
+      //     respSms = resp.data;
+      //     console.log("==================");
+      //     console.log("respSms after then => ", respSms);
+      //     console.log("==================");
+      //   });
 
       if (process.env.ENVIREMENT === "production") {
         axios
-          .get(`http://login.parsgreen.com/UrlService/sendSMS.ashx`, {
-            params: { signature: "7342FB7C-75FD-42B7-9DCE-938B12CBB0CB", from: "10001393", to: phone, text: sms }
+          .get(`http://37.130.202.188/class/sms/webservice/send_url.php`, {
+            params: { from: "+98100020400", to: phone, msg: sms, uname: 09184424686, pass: 9184424686 }
           })
           .then(resp => {
             respSms = resp.data;
           });
-
-        // const xml = (massage, phoneNumber) => `
-        //   <soapenv:Envelope
-        //     xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-        //     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        //     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        //     <soapenv:Body>
-        //       <ns1:enqueue soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-        //         xmlns:ns1="urn:SOAPSmsQueue">
-        //         <domain xsi:type="soapenc:string"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">magfa
-        //         </domain>
-        //         <messages soapenc:arrayType="soapenc:string[1]" xsi:type="soapenc:Array"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
-        //           <messages xsi:type="soapenc:string">${massage}</messages>
-        //         </messages>
-        //         <recipientNumbers soapenc:arrayType="soapenc:string[1]" xsi:type="soapenc:Array"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
-        //           <recipientNumbers xsi:type="soapenc:string">${phoneNumber}</recipientNumbers>
-        //         </recipientNumbers>
-        //         <senderNumbers soapenc:arrayType="soapenc:string[1]" xsi:type="soapenc:Array"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
-        //           <senderNumbers xsi:type="soapenc:string">98300079368</senderNumbers>
-        //         </senderNumbers>
-        //       </ns1:enqueue>
-        //     </soapenv:Body>
-        //   </soapenv:Envelope>
-        //   `;
-
-        // var soapRequest = xml(sms, phone);
-        // // Basic Authentication credentials, if the wsdl needs credentials
-        // var username = "afarin_79368";
-        // var password = "OgGrxilsuuETRePM";
-        // var authenticationHeader = "Basic " + new Buffer(username + ":" + password).toString("base64");
-
-        // request.post(
-        //   {
-        //     uri: "http://sms.magfa.com/services/urn:SOAPSmsQueue?wsdl",
-        //     form: soapRequest,
-        //     headers: {
-        //       "Content-Type": "text/xml;charset=UTF-8",
-        //       SOAPAction: "",
-        //       Authorization: authenticationHeader
-        //     }
-        //   },
-        //   (err, res1, body) => {
-        //     // console.log('body', body);
-        //     // console.log('res1.statusCode', res1.statusCode);
-        //     // console.log('err', err);
-        //     // res.send(body);
-        //   }
-        // );
       }
 
       let codeShomareTimeOut = null;
@@ -112,9 +67,9 @@ exports.loginWithMob = (req, res) => {
       let respone = {};
       if (process.env.ENVIREMENT === "development") {
         respone.code = code;
-        // console.log("==================");
-        // console.log("your code is ", code);
-        // console.log("==================");
+        console.log("==================");
+        console.log("your code is ", code);
+        console.log("==================");
       }
 
       if (user) {
@@ -178,10 +133,13 @@ exports.loginWithCaptcha = (req, res, next) => {
       const sms = "با سلام، کد شما در تیم چه: " + code;
 
       let respSms = null;
-      // axios.get(`http://37.130.202.188/class/sms/webservice/send_url.php?from=10001833181833&to=${ phone }&msg=${ sms }&uname=mohamad1390&pass=88410383`)
-      //   .then((resp) => {
-      //     respSms = resp.data
-      //   })
+      // axios
+      //   .get(
+      //     `http://37.130.202.188/class/sms/webservice/send_url.php?from=10001833181833&to=${phone}&msg=${sms}&uname=mohamad1390&pass=88410383`
+      //   )
+      //   .then(resp => {
+      //     respSms = resp.data;
+      //   });
 
       const GRe = await chaptcha.isHuman(req.body.captcha);
 
@@ -195,58 +153,6 @@ exports.loginWithCaptcha = (req, res, next) => {
             params: { signature: "7342FB7C-75FD-42B7-9DCE-938B12CBB0CB", from: "10001393", to: phone, text: sms }
           })
           .then(resp => resp.data);
-
-        // const xml = (massage, phoneNumber) => `
-        //   <soapenv:Envelope
-        //     xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-        //     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        //     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        //     <soapenv:Body>
-        //       <ns1:enqueue soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-        //         xmlns:ns1="urn:SOAPSmsQueue">
-        //         <domain xsi:type="soapenc:string"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">magfa
-        //         </domain>
-        //         <messages soapenc:arrayType="soapenc:string[1]" xsi:type="soapenc:Array"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
-        //           <messages xsi:type="soapenc:string">${massage}</messages>
-        //         </messages>
-        //         <recipientNumbers soapenc:arrayType="soapenc:string[1]" xsi:type="soapenc:Array"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
-        //           <recipientNumbers xsi:type="soapenc:string">${phoneNumber}</recipientNumbers>
-        //         </recipientNumbers>
-        //         <senderNumbers soapenc:arrayType="soapenc:string[1]" xsi:type="soapenc:Array"
-        //           xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
-        //           <senderNumbers xsi:type="soapenc:string">98300079368</senderNumbers>
-        //         </senderNumbers>
-        //       </ns1:enqueue>
-        //     </soapenv:Body>
-        //   </soapenv:Envelope>
-        //   `;
-
-        // var soapRequest = xml(sms, phone);
-        // // Basic Authentication credentials, if the wsdl needs credentials
-        // var username = "afarin_79368";
-        // var password = "OgGrxilsuuETRePM";
-        // var authenticationHeader = "Basic " + new Buffer(username + ":" + password).toString("base64");
-
-        // request.post(
-        //   {
-        //     uri: "http://sms.magfa.com/services/urn:SOAPSmsQueue?wsdl",
-        //     form: soapRequest,
-        //     headers: {
-        //       "Content-Type": "text/xml;charset=UTF-8",
-        //       SOAPAction: "",
-        //       Authorization: authenticationHeader
-        //     }
-        //   },
-        //   (err, res1, body) => {
-        //     // console.log('body', body);
-        //     // console.log('res1.statusCode', res1.statusCode);
-        //     // console.log('err', err);
-        //     // res.send(body);
-        //   }
-        // );
       }
 
       let codeShomareTimeOut = null;
@@ -306,7 +212,7 @@ exports.acceptKey = (req, res) => {
   // console.log("req.body from acceptKey Authentication", req.body);
   // console.log("==================");
   User.findOne({ phone: req.body.phone })
-    .select("fcmToken authCode phone name familyName level pic")
+    .select("fcmToken authCode phone name familyName officerEt level pic")
     .exec()
     .then(userPey => {
       if (req.body.fcmToken !== userPey.fcmToken) {
@@ -317,7 +223,7 @@ exports.acceptKey = (req, res) => {
       if (_.parseInt(req.body.code) === _.parseInt(userPey.authCode)) {
         return res.send({ token: tok(userPey), user: userPey });
       } else {
-        return res.send({ peygham: "code eshtebah ast" });
+        return res.send({ peygham: "Your code is wrong" });
       }
     })
     .catch(err => res.status(422).send({ error: "we have a issue!", err }));

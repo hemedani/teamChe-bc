@@ -6,6 +6,8 @@ const RasteSchema = new Schema(
     name: String,
     enName: String,
 
+    isic: Number,
+
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
 
     creator: { type: Schema.Types.ObjectId, ref: "User" }

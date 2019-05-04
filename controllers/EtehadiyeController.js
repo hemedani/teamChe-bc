@@ -5,7 +5,7 @@ const Etehadiye = require("../models/Etehadiye");
 const Center = require("../models/Center");
 
 exports.addEtehadiye = (req, res) => {
-  console.log("req.body az addEtehadiye EtehadiyeController", req.body);
+  // console.log("req.body az addEtehadiye EtehadiyeController", req.body);
 
   let {
     name,

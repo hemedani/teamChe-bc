@@ -13,7 +13,7 @@ exports.ckeckAdmin = (req, res, next) => {
 
 exports.checkOfficer = (req, res, next) => {
   // console.log("==================");
-  // console.log("req.user CheckLeve.ckeckAdmin ", req.user);
+  // console.log("req.user CheckLeve.checkOfficer ", req.user);
   // console.log("==================");
 
   if (

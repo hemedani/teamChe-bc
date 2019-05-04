@@ -80,6 +80,7 @@ module.exports = app => {
 
   // ======================= {{ center Sections }} ================================================================
   app.get("/api/centers", jsonParser, CenterController.centers);
+  app.get("/api/protected/centers", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.protectedCenters);
   app.get("/api/center", jsonParser, CenterController.center);
   app.get("/api/center/edited", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.getEditedCenter);
   app.get("/api/centers/params", jsonParser, CenterController.getCentersWithParams);
@@ -117,6 +118,7 @@ module.exports = app => {
   app.get("/api/parishes", jsonParser, ParishController.parishes);
   app.post("/api/parish/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.addParish);
   app.post("/api/parish/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.removeParish);
+  app.get("/api/parish/repair", ParishController.repairParish);
 
   // ======================= {{ rastes Sections }} ================================================================
   app.get("/api/rastes", jsonParser, RasteController.Rastes);

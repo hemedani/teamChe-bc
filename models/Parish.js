@@ -5,6 +5,7 @@ const ParishSchema = new Schema(
   {
     name: String,
     enName: String,
+    fullPath: String,
     state: { type: Schema.Types.ObjectId, ref: "State" },
     city: { type: Schema.Types.ObjectId, ref: "City" },
     location: { type: { type: String }, coordinates: [Number] },
@@ -13,6 +14,8 @@ const ParishSchema = new Schema(
   },
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
+
+ParishSchema.index({ fullPath: "text" });
 
 const ModelClass = mongoose.model("Parish", ParishSchema);
 

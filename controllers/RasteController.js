@@ -7,11 +7,12 @@ const Center = require("../models/Center");
 exports.addRaste = (req, res) => {
   // console.log('req.body az addRaste RasteController', req.body);
 
-  const { name, enName, etehadiye } = req.body;
+  const { name, enName, etehadiye, isic } = req.body;
 
   const raste = new Raste({
     name,
     enName,
+    isic,
 
     etehadiye,
 
@@ -34,38 +35,12 @@ exports.Rastes = (req, res) => {
 exports.updateRaste = (req, res) => {
   // console.log('req.body az yourRaste', req.body)
 
-  const { _id, name, enName } = req.body;
+  const { _id, name, enName, isic } = req.body;
 
-  Raste.findOneAndUpdate({ _id: _id }, { name: name, enName: enName })
+  Raste.findOneAndUpdate({ _id: _id }, { name: name, enName: enName, isic }, { new: true })
     .exec()
-    .then(RasteUpdated => {
-      // console.log('RasteUpdated.enName ', RasteUpdated)
-
-      let Raste = { _id: RasteUpdated._id, name: name, enName: enName, pic: RasteUpdated.pic };
-
-      Center.find({ RastesRef: Raste._id })
-        .exec()
-        .then(CenterFinded => {
-          // let Centers = CenterFinded._doc;
-          // console.log('az to Center.find updateRaste', Centers);
-          if (CenterFinded.length > 0) {
-            Promise.all(
-              CenterFinded.map(Center => {
-                Center.RastesEnName = Center.RastesEnName.filter(en => en !== RasteUpdated.enName);
-                Center.Rastes = Center.Rastes.filter(ct => ct.enName !== RasteUpdated.enName);
-
-                Center.RastesEnName.push(Raste.enName);
-                Center.Rastes.push(Raste);
-
-                return Center.save().then(CenterSaved => CenterSaved);
-              })
-            ).then(resp => res.json({ Raste: Raste, CenterLength: resp.length }));
-          } else {
-            return res.json({ Raste: Raste, CenterLength: 0 });
-          }
-        });
-    })
-    .catch(err => res.status(422).json({ error: "did not saved" }));
+    .then(RasteUpdated => res.json({ Raste: RasteUpdated }))
+    .catch(err => res.status(422).json({ error: "did not saved", err }));
 };
 
 exports.removeRaste = (req, res) => {

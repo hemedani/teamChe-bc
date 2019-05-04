@@ -50,7 +50,8 @@ exports.addCenter = async (req, res) => {
     lat,
     lng,
 
-    picsUploaded
+    picsUploaded,
+    etPic
   } = req.body;
   address.text = text;
 
@@ -85,6 +86,8 @@ exports.addCenter = async (req, res) => {
 
     pics,
     picsRef,
+
+    etPic,
 
     address,
     location: { type: "Point", coordinates: [lng, lat] },
@@ -225,11 +228,53 @@ exports.updateCenter = (req, res, next) => {
 exports.centers = (req, res, next) => {
   // console.log(req.query);
 
-  let idm = mongoose.Types.ObjectId(req.query.id);
+  let query = {};
+  req.query._id
+    ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
+    : (query._id = { $lt: mongoose.Types.ObjectId() });
+  if (req.query.rastes) {
+    let rastes = [];
+    Array.isArray(req.query.rastes) ? (rastes = rastes.concat(req.query.rastes)) : rastes.push(req.query.rastes);
+    query.rastesEnName = { $in: rastes };
+  }
+  if (req.query.wareTypes) {
+    let wareTypes = [];
+    Array.isArray(req.query.wareTypes)
+      ? (wareTypes = wareTypes.concat(req.query.wareTypes))
+      : wareTypes.push(req.query.wareTypes);
+    query.wareTypesEnName = { $in: wareTypes };
+  }
+  req.query.premium == "true" || req.query.premium === true ? (query.premium = req.query.premium) : (query = query);
+  req.query.online == "true" || req.query.online === true ? (query.online = req.query.online) : (query = query);
+  req.query.city ? (query.cityName = req.query.city) : (query = query);
+
+  req.query.name ? (query = { ...query, name: { $regex: req.query.name } }) : (query = query);
+  req.query.enName ? (query = { ...query, enName: { $regex: req.query.enName } }) : (query = query);
+  req.query.address ? (query = { ...query, address: { $regex: req.query.address } }) : (query = query);
+  req.query.etehadiye ? (query = { ...query, etehadiye: req.query.etehadiye }) : (quer = query);
+  // console.log("query baad az doros shodan", query);
+  // console.log("=======================");
+
+  Center.find(query)
+    .limit(30)
+    .sort({ _id: -1 })
+    .exec()
+    .then(centers => res.json({ centers }))
+    .catch(err => res.status(422).send({ error: "we have an issues" }));
+};
+
+exports.protectedCenters = (req, res) => {
+  // console.log("==================");
+  // console.log("req.query from protectedCenters :> ", req.query);
+  // console.log("==================");
+
+  if (!req.query.etehadiye) {
+    return res.status(500).send({ error: "you not have enough access right" });
+  }
 
   let query = {};
-  req.query.id
-    ? (query._id = { $lt: mongoose.Types.ObjectId(req.query.id) })
+  req.query._id
+    ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
     : (query._id = { $lt: mongoose.Types.ObjectId() });
   if (req.query.rastes) {
     let rastes = [];
@@ -302,9 +347,6 @@ exports.getCentersWithParams = function(req, res, next) {
     Center.find(query)
       .skip(limit * page)
       .limit(limit)
-      .select(
-        "name enName cityName workShift expertRate likes phone discount TotalQualityRate TotalPeopleRate TotalPriceRate TotalSalesmanRate options wareTypes rastes labels address premium onlineShop pic location officeDoctors otherAdresses"
-      )
       .exec()
       .then(centers => res.json({ centers }))
       .catch(err => res.status(422).send({ error: "we have an issues" }));
@@ -336,9 +378,6 @@ exports.getCentersWithParams = function(req, res, next) {
       .skip(limit * page)
       .limit(limit)
       .sort(sort)
-      .select(
-        "name enName cityName workShift expertRate likes phone discount TotalQualityRate TotalPeopleRate TotalPriceRate TotalSalesmanRate options wareTypes rastes labels address premium onlineShop pic location officeDoctors otherAdresses"
-      )
       .exec()
       .then(centers => {
         if (req.query.cityId) {
@@ -383,9 +422,6 @@ exports.getCentersWithParams = function(req, res, next) {
     Center.find(query)
       .limit(limit)
       .sort({ _id: -1 })
-      .select(
-        "name enName cityName workShift expertRate likes phone discount TotalQualityRate TotalPeopleRate TotalPriceRate TotalSalesmanRate options wareTypes rastes labels address premium onlineShop description pic location officeDoctors otherAdresses"
-      )
       .exec()
       .then(centers => {
         if (req.query.cityId) {
@@ -1201,3 +1237,9 @@ exports.fixOtherAddressId = (req, res, next) => {
     })
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
+
+// db.createUser( { user: "SydAdmin", pwd: "1195Blue20Shah509@#5543MahSOS", roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ] })
+
+// db.createUser( { user: "TeamCheAdmin", pwd: "Blue1195ShahBottle509", roles: [ { role: "readWrite", db: "TeamChe" }, { role: "read", db: "reporting" } ] })
+
+// sudo ln -s /etc/nginx/sites-available/teamche.com.conf /etc/nginx/sites-enabled/teamche.com.conf
