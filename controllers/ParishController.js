@@ -11,7 +11,7 @@ exports.addParish = (req, res) => {
     state,
     city,
     location: { type: "Point", coordinates: [lng, lat] },
-    polygon: { type: "Polygon", coordinates: polygon },
+    polygon,
     creator: req.user._id
   });
 
@@ -39,6 +39,25 @@ exports.parishes = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
+exports.updateParish = (req, res) => {
+  // console.log('req.body az updateParish', req.body)
+  const { _id, name, enName, polygon, lng, lat } = req.body;
+
+  Parish.findByIdAndUpdate(
+    _id,
+    {
+      name,
+      enName,
+      location: { type: "Point", coordinates: [lng, lat] },
+      polygon
+    },
+    { new: true }
+  )
+    .exec()
+    .then(updatedParish => res.json({ state: updatedParish }))
+    .catch(err => res.status(422).send({ error: "we have an issue", err }));
+};
+
 exports.removeParish = (req, res) => {
   // console.log('req.body az removeParish :', req.body);
   Parish.findOneAndDelete(req.body._id)
@@ -50,13 +69,14 @@ exports.removeParish = (req, res) => {
 exports.repairParish = (_, res) => {
   // console.log('req.body az removeParish :', req.body);
   Parish.find()
-    .select("name fullPath")
+    .select("name fullPath polygon")
     .populate("city state", "name")
     .exec()
     .then(async parishes => {
       const updatedParishes = await Promise.all(
         parishes.map(async parish => {
           parish.fullPath = `${parish.state.name} - ${parish.city.name} - ${parish.name}`;
+          parish.polygon = parish.polygon.coordinates[0][0];
           await parish.save();
           return parish;
         })

@@ -54,6 +54,16 @@ const CenterSchema = new Schema(
     state: { type: Schema.Types.ObjectId, ref: "State" },
     city: { type: Schema.Types.ObjectId, ref: "City" },
 
+    // Parvane Kasb details
+    guildId: Number,
+    issueDate: Date,
+    expirationDate: Date,
+    steward: Boolean,
+    personType: String,
+    activityType: String,
+    isicCode: Number,
+    postalCode: Number,
+
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
     otaghAsnaf: { type: Schema.Types.ObjectId, ref: "otaghAsnaf" },

@@ -118,6 +118,7 @@ module.exports = app => {
   app.get("/api/parishes", jsonParser, ParishController.parishes);
   app.post("/api/parish/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.addParish);
   app.post("/api/parish/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.removeParish);
+  app.post("/api/parish/update", jsonParser, requireAuth, ParishController.updateParish);
   app.get("/api/parish/repair", ParishController.repairParish);
 
   // ======================= {{ rastes Sections }} ================================================================
