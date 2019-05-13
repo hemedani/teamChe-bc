@@ -17,9 +17,9 @@ exports.addCenter = async (req, res) => {
   // Incom :: Method : post ---- need( in req.body) :
   // Ooutput :: Method: json ---- { center: {'---refer to it's model for props---'} }
 
-  console.log("==================");
-  console.log("req.body from CenterController addCenter", req.body);
-  console.log("==================");
+  // console.log("==================");
+  // console.log("req.body from CenterController addCenter", req.body);
+  // console.log("==================");
 
   let {
     name,
@@ -28,7 +28,7 @@ exports.addCenter = async (req, res) => {
     premium,
     onlineShop,
     address,
-    desctiption,
+    description,
     telegram,
     instagram,
     email,
@@ -46,6 +46,7 @@ exports.addCenter = async (req, res) => {
     otaghBazargani,
     otaghAsnaf,
     etehadiye,
+    raste,
 
     lat,
     lng,
@@ -70,7 +71,7 @@ exports.addCenter = async (req, res) => {
     premium,
     onlineShop,
     address,
-    desctiption,
+    description,
     telegram,
     instagram,
     email,
@@ -83,6 +84,7 @@ exports.addCenter = async (req, res) => {
     otaghBazargani,
     otaghAsnaf,
     etehadiye,
+    raste,
 
     pics,
     picsRef,
@@ -113,10 +115,6 @@ exports.addCenter = async (req, res) => {
   await download.image(mapOptions);
   center.staticMap = staticMapImgName;
 
-  console.log("==================");
-  console.log("center before saved", center);
-  console.log("==================");
-
   center
     .save()
     .then(centerSaved => res.json({ center: centerSaved }))
@@ -142,81 +140,78 @@ exports.fixCity = (req, res) => {
     });
 };
 
-exports.CentersCount = async (req, res) => {
+exports.centersCount = async (_, res) => {
   const count = await Center.find().countDocuments();
   return res.send({ CentersCount: count });
 };
 
 exports.updateCenter = (req, res, next) => {
-  // console.log('req.body az updateCenter CenterController', req.body);
+  console.log("req.body az updateCenter CenterController", req.body);
 
-  let options = req.body.options || [],
-    optionsEnName = [],
-    optionsRef = [],
-    wareTypes = req.body.wareTypes || [],
-    wareTypesEnName = [],
-    wareTypesRef = [],
-    rastes = req.body.rastes || [],
-    rastesEnName = [],
-    rastesRef = [],
-    labels = req.body.labels || [],
-    labelsEnName = [],
-    labelsRef = [];
+  let {
+    name,
+    enName,
+    discount,
+    premium,
+    onlineShop,
+    address,
+    description,
+    telegram,
+    instagram,
+    email,
+    website,
+    phone,
 
-  options.map(option => {
-    optionsEnName.push(option.enName);
-    optionsRef.push(option._id);
-  });
-  wareTypes.map(wareType => {
-    wareTypesEnName.push(wareType.enName);
-    wareTypesRef.push(wareType._id);
-  });
-  rastes.map(raste => {
-    rastesEnName.push(raste.enName);
-    rastesRef.push(raste._id);
-  });
-  labels.map(label => {
-    labelsEnName.push(label.enName);
-    labelsRef.push(label._id);
-  });
+    text,
+
+    startWork,
+    endWork,
+
+    state,
+    city,
+    parish,
+    otaghBazargani,
+    otaghAsnaf,
+    etehadiye,
+    raste,
+
+    etPic,
+
+    lat,
+    lng
+  } = req.body;
+  address.text = text;
 
   Center.findOneAndUpdate(
     { _id: req.body._id },
     {
-      name: req.body.name,
-      enName: req.body.enName,
-      cityName: req.body.city.enName,
-      description: req.body.description,
+      name,
+      enName,
+      discount,
+      premium,
+      onlineShop,
+      address,
+      description,
+      telegram,
+      instagram,
+      email,
+      website,
+      phone,
 
-      telegram: req.body.telegram,
-      instagram: req.body.instagram,
-      email: req.body.email,
-      website: req.body.website,
+      workShift: [startWork, endWork],
 
-      options: options,
-      wareTypes: wareTypes,
-      rastes: rastes,
-      labels: labels,
+      state,
+      city,
+      parish,
+      otaghBazargani,
+      otaghAsnaf,
+      etehadiye,
+      raste,
 
-      optionsEnName: optionsEnName,
-      wareTypesEnName: wareTypesEnName,
-      rastesEnName: rastesEnName,
-      labelsEnName: labelsEnName,
+      etPic,
 
-      optionsRef: optionsRef,
-      wareTypesRef: wareTypesRef,
-      rastesRef: rastesRef,
-      labelsRef: labelsRef,
-
-      premium: req.body.premium,
-      discount: req.body.discount,
-      phone: req.body.phone,
-      onlineShop: req.body.onlineShop,
-      address: req.body.address,
-      city: { name: req.body.city.name, enName: req.body.city.name, location: req.body.city.location },
-      cityRef: req.body.city._id,
-      workShift: [req.body.startWork || 1, req.body.endWork || 24],
-      location: { type: "Point", coordinates: [req.body.lng, req.body.lat] }
+      address,
+      location: { type: "Point", coordinates: [lng, lat] }
     },
     { new: true }
   )
@@ -615,7 +610,44 @@ exports.addQualityRate = function(req, res, next) {
     .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 
-exports.addPriceRate = (req, res, next) => {
+exports.addBusinessLicense = (req, res) => {
+  console.log("==================");
+  console.log("req.body from addBusinessLicense CenterController => ", req.body);
+  console.log("==================");
+
+  const {
+    _id,
+    etPic,
+    guildId,
+    issueDate,
+    expirationDate,
+    steward,
+    personType,
+    activityType,
+    isicCode,
+    postalCode
+  } = req.body;
+
+  Center.findOneAndUpdate(
+    { _id },
+    {
+      etPic,
+      guildId,
+      issueDate,
+      expirationDate,
+      steward,
+      personType,
+      activityType,
+      isicCode,
+      postalCode
+    },
+    { new: true }
+  )
+    .then(updatedCenter => res.send({ center: updatedCenter }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
+
+exports.addPriceRate = (req, res) => {
   console.log("req.body az addPriceRate", req.body);
   // console.log('req.user az addPriceRate', req.user)
 
@@ -950,10 +982,6 @@ exports.setOtherAddresses = (req, res, next) => {
     .exec()
     .then(centerUpdated => {
       Center.findById(req.body._id)
-        .populate("doctor")
-        .select(
-          "name enName cityName workShift expertRate likes phone discount TotalQualityRate TotalPeopleRate TotalPriceRate TotalSalesmanRate options wareTypes rastes labels address premium onlineShop description pic location officeDoctors otherAdresses"
-        )
         .exec()
         .then(center => res.json({ center }));
     })
@@ -1066,7 +1094,7 @@ exports.addPicToCenter = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
-exports.addLicensPic = (req, res) => {
+exports.addLicensePic = (req, res) => {
   // console.log(req.body);
   const { _id, licensePic, licensePicRef } = req.body;
 

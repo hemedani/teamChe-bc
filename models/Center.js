@@ -39,12 +39,7 @@ const CenterSchema = new Schema(
     pics: [String],
     picsRef: [{ type: Schema.Types.ObjectId, ref: "File" }],
 
-    etPic: String,
-
     staticMap: String,
-
-    licensePic: String,
-    licensePicRef: { type: Schema.Types.ObjectId, ref: "File" },
 
     creator: { type: Schema.Types.ObjectId, ref: "User" },
     owner: { type: Schema.Types.ObjectId, ref: "User" },
@@ -53,17 +48,21 @@ const CenterSchema = new Schema(
 
     state: { type: Schema.Types.ObjectId, ref: "State" },
     city: { type: Schema.Types.ObjectId, ref: "City" },
+    parish: { type: Schema.Types.ObjectId, ref: "Parish" },
 
     // Parvane Kasb details
+    licensePic: String,
+    licensePicRef: { type: Schema.Types.ObjectId, ref: "File" },
     guildId: Number,
     issueDate: Date,
     expirationDate: Date,
-    steward: Boolean,
+    steward: { type: Boolean, default: false },
     personType: String,
     activityType: String,
     isicCode: Number,
     postalCode: Number,
 
+    etPic: String,
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
     otaghAsnaf: { type: Schema.Types.ObjectId, ref: "otaghAsnaf" },

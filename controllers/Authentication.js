@@ -458,7 +458,7 @@ exports.editUserPass = function(req, res, next) {
     .catch(err => res.status(422).send({ error: "we have an truble" }));
 };
 
-exports.UsersCount = async (req, res) => {
+exports.usersCount = async (req, res) => {
   const count = await User.find().countDocuments();
   return res.send({ UsersCount: count });
 };

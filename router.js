@@ -86,6 +86,13 @@ module.exports = app => {
   app.get("/api/centers/params", jsonParser, CenterController.getCentersWithParams);
   app.post("/api/center/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addCenter);
   app.post("/api/center/add/pic", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addPicToCenter);
+  app.post(
+    "/api/center/add/business/license",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    CenterController.addBusinessLicense
+  );
   app.post("/api/center/edit", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.updateCenter);
   app.post("/api/center/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.removeCenter);
   app.post("/api/center/setexpertrate", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.setExpertRate);
@@ -261,9 +268,9 @@ module.exports = app => {
   app.post("/api/state/update", jsonParser, requireAuth, StateController.updateState);
   app.post("/api/state/remove", jsonParser, requireAuth, StateController.removeState);
 
-  app.get("/api/read/file", jsonParser, requireAuth, CheckLevel.ckeckAdmin, FileController.testReadFile);
+  app.get("/api/read/file", jsonParser, FileController.testReadFile);
 
   // count methods
-  app.get("/api/center/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.CentersCount);
-  app.get("/api/user/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.UsersCount);
+  app.get("/api/center/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.centersCount);
+  app.get("/api/user/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.usersCount);
 };

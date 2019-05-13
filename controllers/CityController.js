@@ -31,7 +31,7 @@ exports.cities = (req, res) => {
 };
 
 exports.removeCity = (req, res) => {
-  // console.log('req.body az removeCity :', req.body);
+  console.log("req.body az removeCity :", req.body);
   City.findByIdAndRemove(req.body._id)
     .exec()
     .then(city => res.send({ msg: "removed succesfully", city }))
