@@ -24,16 +24,20 @@ exports.addParish = (req, res) => {
 exports.parishes = (req, res) => {
   let query = {};
 
+  req.query._id
+    ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
+    : (query._id = { $lt: mongoose.Types.ObjectId() });
   if (req.query.path) query = { ...query, $text: { $search: req.query.path } };
   if (req.query.city) query = { ...query, city };
   if (req.query.state) query = { ...query, state };
 
-  console.log("==================");
-  console.log("query from parishes", query);
-  console.log("==================");
+  // console.log("==================");
+  // console.log("query from parishes", query);
+  // console.log("==================");
 
   Parish.find(query)
-    .limit(30)
+    .limit(15)
+    .sort({ _id: -1 })
     .exec()
     .then(parishes => res.json({ parishes }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));

@@ -94,23 +94,59 @@ exports.updateEtehadiye = (req, res) => {
     .catch(err => res.status(422).json({ error: "did not saved", err }));
 };
 
-exports.addOfficerToEtehadiye = async (req, res) => {
+exports.addOfficerToEtehadiye = (req, res) => {
   const { _id, users } = req.body;
   const usersId = users.map(user => user._id);
 
-  // const updatedEt = await Etehadiye.findOneAndUpdate(
-  //   { _id },
-  //   { $addToSet: { officers: { $each: usersId } } },
-  //   { new: true }
-  // );
+  Etehadiye.findById(_id)
+    .exec()
+    .then(async findedEt => {
+      const availableUser = await User.find({ _id: { $in: usersId } });
 
-  const updatedEt = await Etehadiye.findOneAndUpdate({ _id }, { officers: usersId }, { new: true });
+      const sortedAvailableUserByEt = availableUser.reduce((pValue, cValue) => {
+        if (cValue.officerEt) {
+          pValue[cValue.officerEt] = pValue[cValue.officerEt] || [];
+          pValue[cValue.officerEt].push(cValue._id);
+        }
+        return pValue;
+      }, {});
 
-  const updatedUsers = await Promise.all(
-    usersId.map(userId => User.findOneAndUpdate({ _id: userId }, { officerEt: _id }, { new: true }))
-  );
+      let promises = [];
 
-  return res.json({ etehadiye: updatedEt, users: updatedUsers });
+      for (let key in sortedAvailableUserByEt) {
+        const promise = Etehadiye.findOneAndUpdate(
+          { _id: key },
+          { $pullAll: { officers: sortedAvailableUserByEt[key] } },
+          { new: true }
+        );
+        promises.push(promise);
+      }
+
+      // const clearEts = await Promise.all(
+      //   availableUser.map(avUsr => {
+      //     if (avUsr.officerEt) {
+      //       return Etehadiye.findOneAndUpdate({ _id: avUsr.officerEt }, { $pull: { officers: avUsr._id } }, { new: true });
+      //     }
+      //   })
+      // );
+
+      const clearEts = await Promise.all(promises);
+
+      await Promise.all(
+        findedEt.officers.map(ofId => User.findOneAndUpdate({ _id: ofId }, { officerEt: null }, { new: true }))
+      );
+
+      await Promise.all(usersId.map(ofId => User.findOneAndUpdate({ _id: ofId }, { officerEt: null }, { new: true })));
+
+      const updatedEt = await Etehadiye.findOneAndUpdate({ _id }, { officers: usersId }, { new: true });
+
+      const updatedUsers = await Promise.all(
+        usersId.map(userId => User.findOneAndUpdate({ _id: userId }, { officerEt: _id }, { new: true }))
+      );
+
+      return res.json({ etehadiye: updatedEt, users: updatedUsers, updatedEts: clearEts });
+    })
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.removeEtehadiye = (req, res) => {

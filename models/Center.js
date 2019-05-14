@@ -71,8 +71,13 @@ const CenterSchema = new Schema(
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
 
-CenterSchema.index({ location: "2dsphere" });
+CenterSchema.index({ name: "text", "address.text": "text", location: "2dsphere" });
 
-const ModelClass = mongoose.model("Center", CenterSchema);
+const centerChemaModaClass = mongoose.model("Center", CenterSchema);
+// centerChemaModaClass.ensureIndexes(err => {
+//   console.log("==================");
+//   console.log("err", err);
+//   console.log("==================");
+// });
 
-module.exports = ModelClass;
+module.exports = centerChemaModaClass;

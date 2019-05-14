@@ -259,13 +259,13 @@ exports.centers = (req, res, next) => {
 };
 
 exports.protectedCenters = (req, res) => {
-  // console.log("==================");
-  // console.log("req.query from protectedCenters :> ", req.query);
-  // console.log("==================");
+  console.log("==================");
+  console.log("req.query from protectedCenters :> ", req.query);
+  console.log("==================");
 
-  if (!req.query.etehadiye) {
-    return res.status(500).send({ error: "you not have enough access right" });
-  }
+  // if (!req.query.etehadiye) {
+  //   return res.status(500).send({ error: "you not have enough access right" });
+  // }
 
   let query = {};
   req.query._id
@@ -290,16 +290,31 @@ exports.protectedCenters = (req, res) => {
   req.query.name ? (query = { ...query, name: { $regex: req.query.name } }) : (query = query);
   req.query.enName ? (query = { ...query, enName: { $regex: req.query.enName } }) : (query = query);
   req.query.address ? (query = { ...query, address: { $regex: req.query.address } }) : (query = query);
-  req.query.etehadiye ? (query = { ...query, etehadiye: req.query.etehadiye }) : (quer = query);
-  // console.log("query baad az doros shodan", query);
-  // console.log("=======================");
+  req.query.etehadiye ? (query = { ...query, etehadiye: req.query.etehadiye }) : (query = query);
+  req.query.text ? (query = { ...query, $text: { $search: req.query.text } }) : (query = query);
+
+  console.log("==================");
+  console.log("query from protectedCenters :> ", query);
+  console.log("==================");
 
   Center.find(query)
     .limit(30)
     .sort({ _id: -1 })
     .exec()
-    .then(centers => res.json({ centers }))
-    .catch(err => res.status(422).send({ error: "we have an issues" }));
+    .then(centers => {
+      console.log("==================");
+      console.log("centers protectedCenters", centers);
+      console.log("==================");
+
+      return res.json({ centers });
+    })
+    .catch(err => {
+      console.log("==================");
+      console.log("err protectedCenters", err);
+      console.log("==================");
+
+      return res.status(422).send({ error: "we have an issues", err });
+    });
 };
 
 exports.getCentersWithParams = function(req, res, next) {
