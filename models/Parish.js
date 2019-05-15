@@ -15,8 +15,6 @@ const ParishSchema = new Schema(
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
 
-ParishSchema.index({ fullPath: "text" });
-
 const ModelClass = mongoose.model("Parish", ParishSchema);
 
 module.exports = ModelClass;

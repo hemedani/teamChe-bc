@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Parish = require("../models/Parish");
 
 exports.addParish = (req, res) => {
-  // console.log('req.body az addParish ParishController', req.body);
+  // console.log("req.body az addParish ParishController", req.body);
   const { name, enName, fullPath, state, city, lat, lng, polygon } = req.body;
   const parish = new Parish({
     name,
@@ -27,12 +27,12 @@ exports.parishes = (req, res) => {
   req.query._id
     ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
     : (query._id = { $lt: mongoose.Types.ObjectId() });
-  if (req.query.path) query = { ...query, $text: { $search: req.query.path } };
+  if (req.query.path) query = { ...query, fullPath: { $regex: req.query.path } };
   if (req.query.city) query = { ...query, city };
   if (req.query.state) query = { ...query, state };
 
   // console.log("==================");
-  // console.log("query from parishes", query);
+  // console.log("query from parishes", query, req.query);
   // console.log("==================");
 
   Parish.find(query)
@@ -63,8 +63,8 @@ exports.updateParish = (req, res) => {
 };
 
 exports.removeParish = (req, res) => {
-  // console.log('req.body az removeParish :', req.body);
-  Parish.findOneAndDelete(req.body._id)
+  console.log("req.body az removeParish :", req.body);
+  Parish.findOneAndDelete({ _id: req.body._id })
     .exec()
     .then(parish => res.send({ msg: "removed succesfully", parish }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
@@ -80,7 +80,7 @@ exports.repairParish = (_, res) => {
       const updatedParishes = await Promise.all(
         parishes.map(async parish => {
           parish.fullPath = `${parish.state.name} - ${parish.city.name} - ${parish.name}`;
-          parish.polygon = parish.polygon.coordinates[0][0];
+          // parish.polygon = parish.polygon.coordinates[0][0];
           await parish.save();
           return parish;
         })

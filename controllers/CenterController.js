@@ -92,6 +92,7 @@ exports.addCenter = async (req, res) => {
     etPic,
 
     address,
+    fullPath: `${name}, ${address.state} - ${address.city} - ${address.parish} - ${text}`,
     location: { type: "Point", coordinates: [lng, lat] },
 
     creator: req.user._id
@@ -211,6 +212,7 @@ exports.updateCenter = (req, res, next) => {
       etPic,
 
       address,
+      fullPath: `${name}, ${address.state} - ${address.city} - ${address.parish} - ${text}`,
       location: { type: "Point", coordinates: [lng, lat] }
     },
     { new: true }
@@ -259,14 +261,6 @@ exports.centers = (req, res, next) => {
 };
 
 exports.protectedCenters = (req, res) => {
-  console.log("==================");
-  console.log("req.query from protectedCenters :> ", req.query);
-  console.log("==================");
-
-  // if (!req.query.etehadiye) {
-  //   return res.status(500).send({ error: "you not have enough access right" });
-  // }
-
   let query = {};
   req.query._id
     ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
@@ -303,14 +297,14 @@ exports.protectedCenters = (req, res) => {
     .exec()
     .then(centers => {
       console.log("==================");
-      console.log("centers protectedCenters", centers);
+      console.log("centers", centers);
       console.log("==================");
 
-      return res.json({ centers });
+      res.json({ centers });
     })
     .catch(err => {
       console.log("==================");
-      console.log("err protectedCenters", err);
+      console.log("err", err);
       console.log("==================");
 
       return res.status(422).send({ error: "we have an issues", err });

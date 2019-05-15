@@ -80,7 +80,7 @@ module.exports = app => {
 
   // ======================= {{ center Sections }} ================================================================
   app.get("/api/centers", jsonParser, CenterController.centers);
-  app.get("/api/protected/centers", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.protectedCenters);
+  app.get("/api/protected/centers", jsonParser, requireAuth, CheckLevel.checkOfficer, CenterController.protectedCenters);
   app.get("/api/center", jsonParser, CenterController.center);
   app.get("/api/center/edited", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.getEditedCenter);
   app.get("/api/centers/params", jsonParser, CenterController.getCentersWithParams);

@@ -31,6 +31,7 @@ const CenterSchema = new Schema(
     wares: [{ type: Schema.Types.ObjectId, ref: "Ware" }],
 
     address: { state: String, city: String, parish: String, text: String },
+    fullPath: String,
 
     premium: { type: Boolean, default: false },
     onlineShop: { type: Boolean, default: false },
@@ -71,7 +72,7 @@ const CenterSchema = new Schema(
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
 
-CenterSchema.index({ name: "text", "address.text": "text", location: "2dsphere" });
+CenterSchema.index({ location: "2dsphere" });
 
 const centerChemaModaClass = mongoose.model("Center", CenterSchema);
 // centerChemaModaClass.ensureIndexes(err => {
