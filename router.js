@@ -115,6 +115,7 @@ module.exports = app => {
 
   app.get("/api/centers/fix/office/doctors", jsonParser, CenterController.fixOfficDocters);
   app.get("/api/centers/fix/static/map", jsonParser, CenterController.fixedStaticMaps);
+  app.get("/api/centers/fix/full/path", jsonParser, CenterController.fixCenterFullPath);
 
   // ======================= {{ city Sections }} ================================================================
   app.get("/api/cities", jsonParser, CityController.cities);

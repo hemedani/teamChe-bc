@@ -285,30 +285,31 @@ exports.protectedCenters = (req, res) => {
   req.query.enName ? (query = { ...query, enName: { $regex: req.query.enName } }) : (query = query);
   req.query.address ? (query = { ...query, address: { $regex: req.query.address } }) : (query = query);
   req.query.etehadiye ? (query = { ...query, etehadiye: req.query.etehadiye }) : (query = query);
-  req.query.text ? (query = { ...query, $text: { $search: req.query.text } }) : (query = query);
+  if (req.query.text) query = { ...query, fullPath: { $regex: req.query.text } };
+  if (req.query.geo) {
+    let geo = JSON.parse(req.query.geo);
+    if (geo.coordinates) {
+      query = {
+        ...query,
+        location: {
+          $geoWithin: {
+            $geometry: geo
+          }
+        }
+      };
+    }
+  }
 
-  console.log("==================");
-  console.log("query from protectedCenters :> ", query);
-  console.log("==================");
+  // console.log("==================");
+  // console.log("query from protectedCenters :> ", JSON.stringify(query, null, 2));
+  // console.log("==================");
 
   Center.find(query)
     .limit(30)
     .sort({ _id: -1 })
     .exec()
-    .then(centers => {
-      console.log("==================");
-      console.log("centers", centers);
-      console.log("==================");
-
-      res.json({ centers });
-    })
-    .catch(err => {
-      console.log("==================");
-      console.log("err", err);
-      console.log("==================");
-
-      return res.status(422).send({ error: "we have an issues", err });
-    });
+    .then(centers => res.json({ centers }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.getCentersWithParams = function(req, res, next) {
@@ -1267,6 +1268,23 @@ exports.fixOtherAddressId = (req, res, next) => {
           centerWOAmap.otherAdresses.map(EachOtherAdd => {
             EachOtherAdd._id = mongoose.Types.ObjectId();
           });
+          return centerWOAmap.save().then(centerWOAmapSaved => centerWOAmapSaved);
+        })
+      );
+      return res.send({ centerFixed, centerFixedLength: centerFixed.length });
+    })
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
+
+exports.fixCenterFullPath = (_, res) => {
+  Center.find()
+    .exec()
+    .then(async centersFind => {
+      const centerFixed = await Promise.all(
+        centersFind.map(centerWOAmap => {
+          centerWOAmap.fullPath = `${centerWOAmap.name}, ${centerWOAmap.address.state} - ${centerWOAmap.address.city} - ${
+            centerWOAmap.address.parish
+          } - ${centerWOAmap.address.text}`;
           return centerWOAmap.save().then(centerWOAmapSaved => centerWOAmapSaved);
         })
       );
