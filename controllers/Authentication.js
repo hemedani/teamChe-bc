@@ -4,11 +4,11 @@ const request = require("request");
 const User = require("../models/user");
 const config = require("../config");
 const pnumber = require("pnumber");
-const axios = require("axios");
 const uuidV1 = require("uuid/v1");
 const Tell = require("../service/telephone");
 const _ = require("lodash");
 const chaptcha = require("../service/grecaptcha");
+const SendSMS = require("../service/SendSMS");
 
 function tok(user) {
   const allan = new Date().getTime();
@@ -16,7 +16,7 @@ function tok(user) {
 }
 
 exports.loginWithMob = (req, res) => {
-  // console.log("req.body az loginWithMob", req.body, pnumber.toEnglishDigits(req.body.phone));
+  console.log("req.body az loginWithMob", req.body, pnumber.toEnglishDigits(req.body.phone));
 
   if (!req.body.phone) {
     return res.status(422).send({ error: "you most send your phone number!" });
@@ -37,25 +37,10 @@ exports.loginWithMob = (req, res) => {
 
       let respSms = null;
 
-      // axios
-      //   .get(`http://37.130.202.188/class/sms/webservice/send_url.php`, {
-      //     params: { from: "+98100020400", to: `+${phone}`, msg: sms, uname: "09184424686", pass: "9184424686" }
-      //   })
-      //   .then(resp => {
-      //     respSms = resp.data;
-      //     console.log("==================");
-      //     console.log("respSms after then => ", respSms);
-      //     console.log("==================");
-      //   });
+      SendSMS.sendPattern(phone, code);
 
       if (process.env.ENVIREMENT === "production") {
-        axios
-          .get(`http://37.130.202.188/class/sms/webservice/send_url.php`, {
-            params: { from: "+98100020400", to: `+${phone}`, msg: sms, uname: "09184424686", pass: "9184424686" }
-          })
-          .then(resp => {
-            respSms = resp.data;
-          });
+        SendSMS.sendPattern(phone, code);
       }
 
       let codeShomareTimeOut = null;
@@ -133,13 +118,8 @@ exports.loginWithCaptcha = (req, res, next) => {
       const sms = "با سلام، کد شما در تیم چه: " + code;
 
       let respSms = null;
-      // axios
-      //   .get(
-      //     `http://37.130.202.188/class/sms/webservice/send_url.php?from=10001833181833&to=${phone}&msg=${sms}&uname=mohamad1390&pass=88410383`
-      //   )
-      //   .then(resp => {
-      //     respSms = resp.data;
-      //   });
+
+      // SendSMS.sendPattern(phone, code);
 
       const GRe = await chaptcha.isHuman(req.body.captcha);
 
@@ -148,11 +128,7 @@ exports.loginWithCaptcha = (req, res, next) => {
       }
 
       if (process.env.ENVIREMENT === "production") {
-        axios
-          .get(`http://37.130.202.188/class/sms/webservice/send_url.php`, {
-            params: { from: "+98100020400", to: `+${phone}`, msg: sms, uname: "09184424686", pass: "9184424686" }
-          })
-          .then(resp => (respSms = resp.data));
+        SendSMS.sendPattern(phone, code);
       }
 
       let codeShomareTimeOut = null;

@@ -261,10 +261,17 @@ exports.centers = (req, res, next) => {
 };
 
 exports.protectedCenters = (req, res) => {
-  let query = {};
-  req.query._id
-    ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
-    : (query._id = { $lt: mongoose.Types.ObjectId() });
+  // console.log("==================");
+  // console.log("req.query from protectedCenters", req.query);
+  // console.log("==================");
+
+  let query = {},
+    sort = {},
+    page = 0,
+    limit = 30;
+  // req.query._id
+  //   ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
+  //   : (query._id = { $lt: mongoose.Types.ObjectId() });
   if (req.query.rastes) {
     let rastes = [];
     Array.isArray(req.query.rastes) ? (rastes = rastes.concat(req.query.rastes)) : rastes.push(req.query.rastes);
@@ -287,7 +294,7 @@ exports.protectedCenters = (req, res) => {
   req.query.etehadiye ? (query = { ...query, etehadiye: req.query.etehadiye }) : (query = query);
   if (req.query.text) query = { ...query, fullPath: { $regex: req.query.text } };
   if (req.query.geo) {
-    let geo = JSON.parse(req.query.geo);
+    const geo = JSON.parse(req.query.geo);
     if (geo.coordinates) {
       query = {
         ...query,
@@ -299,14 +306,30 @@ exports.protectedCenters = (req, res) => {
       };
     }
   }
+  if (req.query.near) {
+    const near = JSON.parse(req.query.near);
+    if (near.coordinates) {
+      query = {
+        ...query,
+        location: {
+          $near: {
+            $geometry: near
+          }
+        }
+      };
+    }
+  }
 
-  // console.log("==================");
-  // console.log("query from protectedCenters :> ", JSON.stringify(query, null, 2));
-  // console.log("==================");
+  if (req.query.sort) sort = JSON.parse(req.query.sort);
+
+  console.log("==================");
+  console.log("query - limit, sort, page from protectedCenters :> ", JSON.stringify(query, null, 2), limit, sort, page);
+  console.log("==================");
 
   Center.find(query)
-    .limit(30)
-    .sort({ _id: -1 })
+    .limit(limit)
+    .skip(page * limit)
+    .sort(sort)
     .exec()
     .then(centers => res.json({ centers }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
