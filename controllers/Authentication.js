@@ -37,7 +37,7 @@ exports.loginWithMob = (req, res) => {
 
       let respSms = null;
 
-      SendSMS.sendPattern(phone, code);
+      // SendSMS.sendPattern(phone, code);
 
       if (process.env.ENVIREMENT === "production") {
         SendSMS.sendPattern(phone, code);

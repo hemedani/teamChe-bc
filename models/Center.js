@@ -66,7 +66,7 @@ const CenterSchema = new Schema(
     etPic: String,
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
-    otaghAsnaf: { type: Schema.Types.ObjectId, ref: "otaghAsnaf" },
+    otaghAsnaf: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },
     otaghBazargani: { type: Schema.Types.ObjectId, ref: "OtaghBazargani" }
   },
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }

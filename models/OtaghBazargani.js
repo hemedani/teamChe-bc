@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const ChamberCoSchema = new Schema(
+const OtaghBazarganiSchema = new Schema(
   {
     name: String,
     enName: String,
@@ -26,6 +26,6 @@ const ChamberCoSchema = new Schema(
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
 
-const ModelClass = mongoose.model("ChamberCo", ChamberCoSchema);
+const ModelClass = mongoose.model("OtaghBazargani", OtaghBazarganiSchema);
 
 module.exports = ModelClass;

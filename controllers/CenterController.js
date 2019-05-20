@@ -468,29 +468,14 @@ exports.getCentersWithParams = function(req, res, next) {
 };
 
 exports.center = (req, res) => {
-  // console.log('req.query az exports.center', req.query)
+  // console.log("req.query az exports.center", req.query);
   // console.log('req.headers az exports.center', req.headers)
 
   Center.findById(req.query._id)
+    .populate("raste etehadiye otaghAsnaf otaghBazargani")
     .exec()
-    .then(center => {
-      let editCenter = Object.assign({ hasLiked: false }, center._doc);
-      let sabti = req.headers.sabti || null;
-      sabti === "null" || sabti === "undefined" ? (sabti = null) : (sabti = sabti);
-      if (sabti) {
-        let decode = jwt.decode(req.headers.sabti, config.secret);
-        User.findById(decode.sub)
-          .exec()
-          .then(userFind => {
-            let isLiked = userFind.centersLiked.some(LikeId => LikeId.equals(center._id));
-            if (isLiked) editCenter.hasLiked = true;
-            return res.json({ center: editCenter });
-          });
-      } else {
-        return res.json({ center: editCenter });
-      }
-    })
-    .catch(err => res.status(422).send({ error: "we have an issues" }));
+    .then(center => res.json({ center }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.getEditedCenter = (req, res, next) => {
