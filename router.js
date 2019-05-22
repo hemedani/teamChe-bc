@@ -146,6 +146,15 @@ module.exports = app => {
     EtehadiyeController.addOfficerToEtehadiye
   );
   app.post("/api/etehadiye/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.updateEtehadiye);
+  app.put(
+    "/api/etehadiye/change/pic",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    uploadWithExt.single("file"),
+    FileController.uploadMiddleware,
+    EtehadiyeController.changeEtehadiyePic
+  );
   app.post("/api/etehadiye/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.removeEtehadiye);
 
   // ======================= {{ otaghAsnafs Sections }} ================================================================

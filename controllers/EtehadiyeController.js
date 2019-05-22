@@ -3,6 +3,8 @@ var _ = require("lodash");
 const User = require("../models/user");
 const Etehadiye = require("../models/Etehadiye");
 const Center = require("../models/Center");
+const File = require("../models/File");
+const fs = require("fs");
 
 exports.addEtehadiye = (req, res) => {
   // console.log("req.body az addEtehadiye EtehadiyeController", req.body);
@@ -94,6 +96,31 @@ exports.updateEtehadiye = (req, res) => {
     .catch(err => res.status(422).json({ error: "did not saved", err }));
 };
 
+exports.changeEtehadiyePic = (req, res) => {
+  const _id = req.body._id,
+    pic = req.pic.name,
+    picRef = req.pic._id;
+  Etehadiye.findById(_id)
+    .exec()
+    .then(async findedEt => {
+      await File.findOneAndDelete({ _id: findedEt.picRef }).exec();
+      if (findedEt.pic) {
+        fs.unlinkSync(`./pic/orginal/${findedEt.pic}`);
+        fs.unlinkSync(`./pic/800/${findedEt.pic}`);
+        fs.unlinkSync(`./pic/500/${findedEt.pic}`);
+        fs.unlinkSync(`./pic/240/${findedEt.pic}`);
+        fs.unlinkSync(`./pic/120/${findedEt.pic}`);
+        fs.unlinkSync(`./pic/100/${findedEt.pic}`);
+      }
+      findedEt.pic = pic;
+      findedEt.picRef = picRef;
+      const savedEt = await findedEt.save();
+      const updatedCenters = await Center.updateMany({ etehadiye: findedEt._id }, { etPic: pic });
+      return res.send({ etehadiye: savedEt, nCModified: updatedCenters.nModified });
+    })
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
+
 exports.addOfficerToEtehadiye = (req, res) => {
   const { _id, users } = req.body;
   const usersId = users.map(user => user._id);
@@ -151,7 +178,7 @@ exports.addOfficerToEtehadiye = (req, res) => {
 
 exports.removeEtehadiye = (req, res) => {
   // console.log('req.body az removeEtehadiye :', req.body);
-  Etehadiye.findOneAndDelete(req.body._id)
+  Etehadiye.findOneAndDelete({ _id: req.body._id })
     .exec()
     .then(removedEtehadiye => res.json({ etehadiye: removedEtehadiye }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
