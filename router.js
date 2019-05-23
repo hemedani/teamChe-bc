@@ -29,6 +29,8 @@ const EtehadiyeController = require("./controllers/EtehadiyeController");
 const OtaghAsnafController = require("./controllers/OtaghAsnafController");
 const OtaghBazarganiController = require("./controllers/OtaghBazarganiController");
 
+const ReportController = require("./controllers/ReportController");
+
 const CheckLevel = require("./service/CheckLevel");
 
 const storage = multer.diskStorage({
@@ -162,6 +164,11 @@ module.exports = app => {
   app.post("/api/otaghAsnaf/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.addOtaghAsnaf);
   app.post("/api/otaghAsnaf/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.updateOtaghAsnaf);
   app.post("/api/otaghAsnaf/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.removeOtaghAsnaf);
+
+  // ======================= {{ otaghAsnafs Sections }} ================================================================
+  app.get("/api/reports", jsonParser, ReportController.reports);
+  app.post("/api/report/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ReportController.addReport);
+  app.post("/api/report/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ReportController.removeReport);
 
   // ======================= {{ otaghBazarganis Sections }} ================================================================
   app.get("/api/otaghBazarganis", jsonParser, OtaghBazarganiController.OtaghBazarganis);
