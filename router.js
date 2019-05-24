@@ -85,6 +85,13 @@ module.exports = app => {
   app.get("/api/protected/centers", jsonParser, requireAuth, CheckLevel.checkOfficer, CenterController.protectedCenters);
   app.get("/api/center", jsonParser, CenterController.center);
   app.get("/api/center/edited", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.getEditedCenter);
+  app.post(
+    "/api/center/set/location",
+    jsonParser,
+    requireAuth,
+    CheckLevel.checkOfficer,
+    CenterController.setLocationForCenter
+  );
   app.get("/api/centers/params", jsonParser, CenterController.getCentersWithParams);
   app.post("/api/center/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addCenter);
   app.post("/api/center/add/pic", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addPicToCenter);
@@ -167,6 +174,7 @@ module.exports = app => {
 
   // ======================= {{ otaghAsnafs Sections }} ================================================================
   app.get("/api/reports", jsonParser, ReportController.reports);
+  app.get("/api/report", jsonParser, ReportController.report);
   app.post("/api/report/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ReportController.addReport);
   app.post("/api/report/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ReportController.removeReport);
 

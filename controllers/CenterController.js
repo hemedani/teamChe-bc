@@ -478,6 +478,35 @@ exports.center = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
+exports.setLocationForCenter = async (req, res) => {
+  // console.log("==================");
+  // console.log("req.body =>", req.body);
+  // console.log("==================");
+
+  const { _id, lat, lng } = req.body;
+
+  const staticMap = `${uuidv4()}.png`;
+
+  const mapOptions = {
+    url: `https://maps.googleapis.com/maps/api/staticmap?language=fa&center=${lat},${lng}&zoom=16&size=640x400&maptype=roadmap&markers=icon:https://pasteboard.co/IagJJEM.png%7C${lat},${lng}&key=AIzaSyCPfDQXNU5sl3Ar7gfy-CSbWijyHJ2mjrY`,
+    dest: `./pic/maps/${staticMap}`
+  };
+
+  await download.image(mapOptions);
+
+  Center.findOneAndUpdate(
+    { _id },
+    {
+      location: { type: "Point", coordinates: [lng, lat] },
+      staticMap
+    },
+    { new: true }
+  )
+    .exec()
+    .then(updatedCenter => res.send({ center: updatedCenter }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
+
 exports.getEditedCenter = (req, res, next) => {
   // console.log('req.query az exports.center', req.query)
   // console.log('req.headers az exports.center', req.headers)
