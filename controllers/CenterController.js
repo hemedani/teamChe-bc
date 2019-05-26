@@ -319,10 +319,11 @@ exports.protectedCenters = (req, res) => {
   }
 
   if (req.query.sort) sort = JSON.parse(req.query.sort);
+  if (req.query.page) page = req.query.page;
 
-  console.log("==================");
-  console.log("query - limit, sort, page from protectedCenters :> ", JSON.stringify(query, null, 2), limit, sort, page);
-  console.log("==================");
+  // console.log("==================");
+  // console.log("query - limit, sort, page from protectedCenters :> ", JSON.stringify(query, null, 2), limit, sort, page);
+  // console.log("==================");
 
   Center.find(query)
     .limit(limit)
