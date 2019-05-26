@@ -21,14 +21,25 @@ exports.addRaste = (req, res) => {
 
   raste
     .save()
-    .then(RasteSaved => res.json({ Raste: RasteSaved }))
+    .then(RasteSaved => res.json({ raste: RasteSaved }))
     .catch(err => res.status(422).send({ error: "We have an issues", err }));
 };
 
 exports.Rastes = (req, res) => {
-  Raste.find()
+  let query = {};
+
+  req.query._id
+    ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
+    : (query._id = { $lt: mongoose.Types.ObjectId() });
+  if (req.query.name) query = { ...query, name: { $regex: req.query.name } };
+  if (req.query.etehadiye) query = { ...query, etehadiye };
+
+  // console.log("==================");
+  // console.log("query from Rastes", query, req.query);
+  // console.log("==================");
+  Raste.find(query)
     .exec()
-    .then(Rastes => res.json({ Rastes }))
+    .then(rastes => res.json({ rastes }))
     .catch(err => res.status(422).send({ error: "We have an issues", err }));
 };
 
@@ -39,7 +50,7 @@ exports.updateRaste = (req, res) => {
 
   Raste.findOneAndUpdate({ _id: _id }, { name: name, enName: enName, isic }, { new: true })
     .exec()
-    .then(RasteUpdated => res.json({ Raste: RasteUpdated }))
+    .then(RasteUpdated => res.json({ raste: RasteUpdated }))
     .catch(err => res.status(422).json({ error: "did not saved", err }));
 };
 

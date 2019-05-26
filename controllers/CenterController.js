@@ -272,11 +272,8 @@ exports.protectedCenters = (req, res) => {
   // req.query._id
   //   ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
   //   : (query._id = { $lt: mongoose.Types.ObjectId() });
-  if (req.query.rastes) {
-    let rastes = [];
-    Array.isArray(req.query.rastes) ? (rastes = rastes.concat(req.query.rastes)) : rastes.push(req.query.rastes);
-    query.rastesEnName = { $in: rastes };
-  }
+  if (req.query.rastes && req.query.rastes.length > 0) query.raste = { $in: req.query.rastes };
+
   if (req.query.wareTypes) {
     let wareTypes = [];
     Array.isArray(req.query.wareTypes)
@@ -284,6 +281,7 @@ exports.protectedCenters = (req, res) => {
       : wareTypes.push(req.query.wareTypes);
     query.wareTypesEnName = { $in: wareTypes };
   }
+
   req.query.premium == "true" || req.query.premium === true ? (query.premium = req.query.premium) : (query = query);
   req.query.online == "true" || req.query.online === true ? (query.online = req.query.online) : (query = query);
   req.query.city ? (query.cityName = req.query.city) : (query = query);
