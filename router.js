@@ -121,7 +121,15 @@ module.exports = app => {
     CheckLevel.ckeckAdmin,
     CenterController.removeAOtherAddFromCenter
   );
-
+  app.put(
+    "/api/center/add/one/pic",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    uploadWithExt.single("file"),
+    FileController.uploadMiddleware,
+    CenterController.addOnePicToCenter
+  );
   app.get("/api/centers/fix/office/doctors", jsonParser, CenterController.fixOfficDocters);
   app.get("/api/centers/fix/static/map", jsonParser, CenterController.fixedStaticMaps);
   app.get("/api/centers/fix/full/path", jsonParser, CenterController.fixCenterFullPath);

@@ -13,7 +13,7 @@ const uuidV1 = require("uuid/v1");
 const fs = require("fs");
 const sharp = require("sharp");
 
-exports.upload = (req, res, next) => {
+exports.upload = (req, res) => {
   if (!req.file.mimetype.startsWith("image/")) {
     return res.status(422).json({
       error: "The uploaded file must be an image"

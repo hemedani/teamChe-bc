@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const Report = require("../models/Report");
 
 exports.addReport = (req, res) => {
-  console.log("==================");
-  console.log("req.body from addReport", req.body);
-  console.log("==================");
+  // console.log("==================");
+  // console.log("req.body from addReport", req.body);
+  // console.log("==================");
 
   const { text, raste, etehadiye, otaghAsnaf, otaghBazargani, state, city, parish, center } = req.body;
   const report = new Report({

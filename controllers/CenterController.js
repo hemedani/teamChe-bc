@@ -13,6 +13,18 @@ const exRate = require("../service/exRate").exRate;
 const download = require("image-downloader");
 const uuidv4 = require("uuid/v4");
 
+const updateStaticMap = async (lat, lng) => {
+  const staticMapImgName = `${uuidv4()}.png`;
+
+  const mapOptions = {
+    url: `https://maps.googleapis.com/maps/api/staticmap?language=fa&center=${lat},${lng}&zoom=16&size=640x400&maptype=roadmap&markers=icon:https://pasteboard.co/IagJJEM.png%7C${lat},${lng}&key=AIzaSyCPfDQXNU5sl3Ar7gfy-CSbWijyHJ2mjrY`,
+    dest: `./pic/maps/${staticMapImgName}`
+  };
+
+  await download.image(mapOptions);
+  return staticMapImgName;
+};
+
 exports.addCenter = async (req, res) => {
   // Incom :: Method : post ---- need( in req.body) :
   // Ooutput :: Method: json ---- { center: {'---refer to it's model for props---'} }
@@ -102,19 +114,7 @@ exports.addCenter = async (req, res) => {
     center.workShift = [startWork, endWork];
   }
 
-  const staticMapImgName = `${uuidv4()}.png`;
-
-  const mapOptions = {
-    url: `https://maps.googleapis.com/maps/api/staticmap?language=fa&center=${req.body.lat},${
-      req.body.lng
-    }&zoom=16&size=640x400&maptype=roadmap&markers=icon:https://pasteboard.co/IagJJEM.png%7C${req.body.lat},${
-      req.body.lng
-    }&key=AIzaSyCPfDQXNU5sl3Ar7gfy-CSbWijyHJ2mjrY`,
-    dest: `./pic/maps/${staticMapImgName}`
-  };
-
-  await download.image(mapOptions);
-  center.staticMap = staticMapImgName;
+  center.staticMap = await updateStaticMap(lat, lng);
 
   center
     .save()
@@ -146,8 +146,13 @@ exports.centersCount = async (_, res) => {
   return res.send({ CentersCount: count });
 };
 
-exports.updateCenter = (req, res, next) => {
-  console.log("req.body az updateCenter CenterController", req.body);
+exports.addOnePicToCenter = (req, res) => {
+  Center.findOneAndUpdate({ _id: req.body._id }, { $push: { pics: req.pic.name, picsRef: req.pic._id } }, { new: true })
+    .exec()
+    .then(updatedCenter => res.send({ center: updatedCenter }));
+};
+exports.updateCenter = async (req, res) => {
+  // console.log("req.body az updateCenter CenterController", req.body);
 
   let {
     name,
@@ -182,6 +187,7 @@ exports.updateCenter = (req, res, next) => {
     lng
   } = req.body;
   address.text = text;
+  const staticMap = await updateStaticMap(lat, lng);
 
   Center.findOneAndUpdate(
     { _id: req.body._id },
@@ -213,7 +219,8 @@ exports.updateCenter = (req, res, next) => {
 
       address,
       fullPath: `${name}, ${address.state} - ${address.city} - ${address.parish} - ${text}`,
-      location: { type: "Point", coordinates: [lng, lat] }
+      location: { type: "Point", coordinates: [lng, lat] },
+      staticMap
     },
     { new: true }
   )
