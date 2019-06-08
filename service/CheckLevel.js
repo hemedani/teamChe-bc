@@ -19,6 +19,7 @@ exports.checkOfficer = (req, res, next) => {
   if (
     _.includes(req.user.level, "tarah") ||
     _.includes(req.user.level, "admin") ||
+    _.includes(req.user.level, "organic.boss") ||
     _.includes(req.user.level, "organic.officer")
   ) {
     next();

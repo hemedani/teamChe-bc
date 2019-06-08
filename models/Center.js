@@ -63,6 +63,18 @@ const CenterSchema = new Schema(
     isicCode: Number,
     postalCode: Number,
 
+    guildOwnerName: String,
+    guildOwnerFamily: String,
+    identificationCode: Number,
+    nationalCode: Number,
+    ownerFatherName: String,
+    ownerBirthDate: Date,
+
+    waterPlaque: Number,
+    registrationPlaque: Number,
+
+    membershipFeeDate: Date,
+
     etPic: String,
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },

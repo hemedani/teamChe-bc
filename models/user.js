@@ -39,7 +39,7 @@ const userSchema = new Schema(
           "expert",
           "owner",
           "editor",
-          "auther",
+          "author",
           "tarah",
           "admin",
           "storekeeper",
@@ -66,6 +66,7 @@ const userSchema = new Schema(
     pic: String,
     fcmToken: String,
     officerEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
+    bossEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
     picRef: { type: Schema.Types.ObjectId, ref: "File" }
   },
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }

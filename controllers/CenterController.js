@@ -664,13 +664,14 @@ exports.addQualityRate = function(req, res, next) {
 };
 
 exports.addBusinessLicense = (req, res) => {
-  console.log("==================");
-  console.log("req.body from addBusinessLicense CenterController => ", req.body);
-  console.log("==================");
+  // console.log("==================");
+  // console.log("req.body from addBusinessLicense CenterController => ", req.body);
+  // console.log("==================");
 
   const {
     _id,
-    etPic,
+    licensePic,
+    licensePicRef,
     guildId,
     issueDate,
     expirationDate,
@@ -678,13 +679,23 @@ exports.addBusinessLicense = (req, res) => {
     personType,
     activityType,
     isicCode,
-    postalCode
+    postalCode,
+    guildOwnerName,
+    guildOwnerFamily,
+    identificationCode,
+    nationalCode,
+    ownerFatherName,
+    ownerBirthDate,
+    waterPlaque,
+    registrationPlaque,
+    membershipFeeDate
   } = req.body;
 
   Center.findOneAndUpdate(
     { _id },
     {
-      etPic,
+      licensePic,
+      licensePicRef,
       guildId,
       issueDate,
       expirationDate,
@@ -692,7 +703,16 @@ exports.addBusinessLicense = (req, res) => {
       personType,
       activityType,
       isicCode,
-      postalCode
+      postalCode,
+      guildOwnerName,
+      guildOwnerFamily,
+      identificationCode,
+      nationalCode,
+      ownerFatherName,
+      ownerBirthDate,
+      waterPlaque,
+      registrationPlaque,
+      membershipFeeDate
     },
     { new: true }
   )
