@@ -92,6 +92,13 @@ module.exports = app => {
     CheckLevel.checkOfficer,
     CenterController.setLocationForCenter
   );
+  app.post(
+    "/api/center/update/protected",
+    jsonParser,
+    requireAuth,
+    CheckLevel.checkOfficer,
+    CenterController.updateProtectedCenter
+  );
   app.get("/api/centers/params", jsonParser, CenterController.getCentersWithParams);
   app.post("/api/center/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addCenter);
   app.post("/api/center/add/pic", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addPicToCenter);

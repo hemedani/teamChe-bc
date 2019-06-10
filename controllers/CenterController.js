@@ -13,11 +13,13 @@ const exRate = require("../service/exRate").exRate;
 const download = require("image-downloader");
 const uuidv4 = require("uuid/v4");
 
+const StaticMapApi = "AIzaSyCxOHHEJ0dio2EAIAxeKzUnPimk7GNJpn0";
+
 const updateStaticMap = async (lat, lng) => {
   const staticMapImgName = `${uuidv4()}.png`;
 
   const mapOptions = {
-    url: `https://maps.googleapis.com/maps/api/staticmap?language=fa&center=${lat},${lng}&zoom=16&size=640x400&maptype=roadmap&markers=icon:https://pasteboard.co/IagJJEM.png%7C${lat},${lng}&key=AIzaSyCPfDQXNU5sl3Ar7gfy-CSbWijyHJ2mjrY`,
+    url: `https://maps.googleapis.com/maps/api/staticmap?language=fa&center=${lat},${lng}&zoom=16&size=640x400&maptype=roadmap&markers=icon:https://pasteboard.co/IagJJEM.png%7C${lat},${lng}&key=${StaticMapApi}`,
     dest: `./pic/maps/${staticMapImgName}`
   };
 
@@ -188,42 +190,113 @@ exports.updateCenter = async (req, res) => {
   } = req.body;
   address.text = text;
   const staticMap = await updateStaticMap(lat, lng);
+  let updatedObj = {
+    name,
+    enName,
+    discount,
+    premium,
+    onlineShop,
+    address,
+    description,
+    telegram,
+    instagram,
+    email,
+    website,
+    phone,
 
-  Center.findOneAndUpdate(
-    { _id: req.body._id },
-    {
-      name,
-      enName,
-      discount,
-      premium,
-      onlineShop,
-      address,
-      description,
-      telegram,
-      instagram,
-      email,
-      website,
-      phone,
+    state,
+    city,
+    parish,
+    otaghBazargani,
+    otaghAsnaf,
+    etehadiye,
+    raste,
 
-      workShift: [startWork, endWork],
+    etPic,
 
-      state,
-      city,
-      parish,
-      otaghBazargani,
-      otaghAsnaf,
-      etehadiye,
-      raste,
+    address,
+    fullPath: `${name}, ${address.state} - ${address.city} - ${address.parish} - ${text}`,
+    location: { type: "Point", coordinates: [lng, lat] },
+    staticMap
+  };
+  if (startWork && endWork) {
+    updatedObj.workShift = [startWork, endWork];
+  }
 
-      etPic,
+  Center.findOneAndUpdate({ _id: req.body._id }, updatedObj, { new: true })
+    .exec()
+    .then(center => res.json({ center }))
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
 
-      address,
-      fullPath: `${name}, ${address.state} - ${address.city} - ${address.parish} - ${text}`,
-      location: { type: "Point", coordinates: [lng, lat] },
-      staticMap
-    },
-    { new: true }
-  )
+exports.updateProtectedCenter = (req, res) => {
+  // console.log("==================");
+  // console.log("req.body from updateProtected Center", req.body);
+  // console.log("==================");
+
+  let {
+    _id,
+    name,
+    discount,
+    description,
+    telegram,
+    instagram,
+    email,
+    website,
+
+    guildId,
+    issueDate,
+    expirationDate,
+    steward,
+    personType,
+    activityType,
+    isicCode,
+    postalCode,
+
+    guildOwnerName,
+    guildOwnerFamily,
+    identificationCode,
+    nationalCode,
+    ownerFatherName,
+    ownerBirthDate,
+
+    waterPlaque,
+    registrationPlaque,
+
+    membershipFeeDate
+  } = req.body;
+
+  let updatedObj = {
+    name,
+    discount,
+    description,
+    telegram,
+    instagram,
+    email,
+    website,
+
+    guildId,
+    steward,
+    personType,
+    activityType,
+    isicCode,
+    postalCode,
+
+    guildOwnerName,
+    guildOwnerFamily,
+    identificationCode,
+    nationalCode,
+    ownerFatherName,
+
+    waterPlaque,
+    registrationPlaque
+  };
+  if (membershipFeeDate) updatedObj.membershipFeeDate = membershipFeeDate;
+  if (issueDate) updatedObj.issueDate = issueDate;
+  if (expirationDate) updatedObj.expirationDate = expirationDate;
+  if (ownerBirthDate) updatedObj.ownerBirthDate = ownerBirthDate;
+
+  Center.findOneAndUpdate({ _id }, updatedObj, { new: true })
     .exec()
     .then(center => res.json({ center }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
@@ -660,7 +733,7 @@ exports.addQualityRate = function(req, res, next) {
           });
       }
     })
-    .catch(err => res.status(422).send({ error: "we have an issues" }));
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.addBusinessLicense = (req, res) => {
