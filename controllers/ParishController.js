@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Parish = require("../models/Parish");
+const Etehadiye = require("../models/Etehadiye");
 
 exports.addParish = (req, res) => {
   // console.log("req.body az addParish ParishController", req.body);
@@ -21,15 +22,22 @@ exports.addParish = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
-exports.parishes = (req, res) => {
+exports.parishes = async (req, res) => {
   let query = {};
 
-  req.query._id
-    ? (query._id = { $lt: mongoose.Types.ObjectId(req.query._id) })
-    : (query._id = { $lt: mongoose.Types.ObjectId() });
-  if (req.query.path) query = { ...query, fullPath: { $regex: req.query.path } };
-  if (req.query.city) query = { ...query, city };
-  if (req.query.state) query = { ...query, state };
+  const { _id, path, city, state } = req.query;
+  _id ? (query._id = { $lt: mongoose.Types.ObjectId(_id) }) : (query._id = { $lt: mongoose.Types.ObjectId() });
+  if (path) query.fullPath = { $regex: path };
+  if (city) query.city = city;
+  if (state) query.state = state;
+
+  const getEtCity = async etId => {
+    const et = await Etehadiye.findById(etId).exec();
+    return (query.city = et.city);
+  };
+
+  if (req.user.officerEt || req.user.operatorEt || req.user.bossEt)
+    await getEtCity(req.user.officerEt || req.user.operatorEt || req.user.bossEt);
 
   // console.log("==================");
   // console.log("query from parishes", query, req.query);

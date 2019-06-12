@@ -149,14 +149,6 @@ exports.addOfficerToEtehadiye = (req, res) => {
         promises.push(promise);
       }
 
-      // const clearEts = await Promise.all(
-      //   availableUser.map(avUsr => {
-      //     if (avUsr.officerEt) {
-      //       return Etehadiye.findOneAndUpdate({ _id: avUsr.officerEt }, { $pull: { officers: avUsr._id } }, { new: true });
-      //     }
-      //   })
-      // );
-
       const clearEts = await Promise.all(promises);
 
       await Promise.all(

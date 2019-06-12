@@ -147,7 +147,7 @@ module.exports = app => {
   app.post("/api/city/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CityController.removeCity);
 
   // ======================= {{ parish Sections }} ================================================================
-  app.get("/api/parishes", jsonParser, ParishController.parishes);
+  app.get("/api/parishes", jsonParser, requireAuth, ParishController.parishes);
   app.post("/api/parish/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.addParish);
   app.post("/api/parish/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ParishController.removeParish);
   app.post("/api/parish/update", jsonParser, requireAuth, ParishController.updateParish);

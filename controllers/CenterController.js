@@ -43,14 +43,15 @@ const updateStaticMap = async (lat, lng) => {
 };
 
 exports.addCenter = async (req, res) => {
-  // Incom :: Method : post ---- need( in req.body) :
-  // Ooutput :: Method: json ---- { center: {'---refer to it's model for props---'} }
+  // Income :: Method : post ---- need( in req.body) :
+  // Output :: Method: json ---- { center: {'---refer to it's model for props---'} }
 
   // console.log("==================");
   // console.log("req.body from CenterController addCenter", req.body);
   // console.log("==================");
 
   let {
+    guildId,
     name,
     enName,
     discount,
@@ -85,6 +86,16 @@ exports.addCenter = async (req, res) => {
   } = req.body;
   address.text = text;
 
+  if (!guildId) {
+    return res.status(500).send({ error: "بدون شناسه صنفی نمیتوانید مرکز اضافه کنید" });
+  }
+
+  const fundedCenterByGuildId = await Center.findOne({ guildId }).exec();
+
+  if (fundedCenterByGuildId) {
+    return res.status(500).send({ error: "این شناسه صنفی قبلا وارد شده است" });
+  }
+
   let pics = [],
     picsRef = [];
 
@@ -94,6 +105,7 @@ exports.addCenter = async (req, res) => {
   });
 
   let center = new Center({
+    guildId,
     name,
     enName,
     discount,
@@ -760,7 +772,6 @@ exports.addBusinessLicense = (req, res) => {
     _id,
     licensePic,
     licensePicRef,
-    guildId,
     issueDate,
     expirationDate,
     steward,
@@ -776,7 +787,8 @@ exports.addBusinessLicense = (req, res) => {
     ownerBirthDate,
     waterPlaque,
     registrationPlaque,
-    membershipFeeDate
+    membershipFeeDate,
+    guildOwnerPhoneNumber
   } = req.body;
 
   Center.findOneAndUpdate(
@@ -784,7 +796,6 @@ exports.addBusinessLicense = (req, res) => {
     {
       licensePic,
       licensePicRef,
-      guildId,
       issueDate,
       expirationDate,
       steward,
@@ -800,7 +811,8 @@ exports.addBusinessLicense = (req, res) => {
       ownerBirthDate,
       waterPlaque,
       registrationPlaque,
-      membershipFeeDate
+      membershipFeeDate,
+      guildOwnerPhoneNumber
     },
     { new: true }
   )

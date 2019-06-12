@@ -54,7 +54,7 @@ const CenterSchema = new Schema(
     // Parvane Kasb details
     licensePic: String,
     licensePicRef: { type: Schema.Types.ObjectId, ref: "File" },
-    guildId: Number,
+    guildId: { type: Number, unique: true },
     issueDate: Date,
     expirationDate: Date,
     steward: { type: Boolean, default: false },
@@ -65,6 +65,7 @@ const CenterSchema = new Schema(
 
     guildOwnerName: String,
     guildOwnerFamily: String,
+    guildOwnerPhoneNumber: Number,
     identificationCode: Number,
     nationalCode: Number,
     ownerFatherName: String,

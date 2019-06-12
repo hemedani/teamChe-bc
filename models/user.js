@@ -44,7 +44,7 @@ const userSchema = new Schema(
           "admin",
           "storekeeper",
           "delivery",
-          "organic.boss",
+          "organic.bossEt",
           "organic.veep",
           "organic.officer",
           "organic.administrationManager",
@@ -56,7 +56,10 @@ const userSchema = new Schema(
           "organic.inspector",
           "organic.commissionAffairs",
           "organic.secretariat",
-          "organic.accountant"
+          "organic.accountant",
+
+          "organic.operatorEt",
+          "organic.operatorAs"
         ],
         default: ["normal"]
       }
@@ -66,7 +69,11 @@ const userSchema = new Schema(
     pic: String,
     fcmToken: String,
     officerEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
+    operatorEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
     bossEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
+
+    operatorAs: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },
+
     picRef: { type: Schema.Types.ObjectId, ref: "File" }
   },
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
