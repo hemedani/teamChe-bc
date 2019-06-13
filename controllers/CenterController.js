@@ -293,31 +293,29 @@ exports.updateProtectedCenter = (req, res) => {
     membershipFeeDate
   } = req.body;
 
-  let updatedObj = {
-    name,
-    discount,
-    description,
-    telegram,
-    instagram,
-    email,
-    website,
+  let updatedObj = {};
 
-    guildId,
-    steward,
-    personType,
-    activityType,
-    isicCode,
-    postalCode,
+  if (name) updatedObj.name = name;
+  if (discount) updatedObj.discount = discount;
+  if (description) updatedObj.description = description;
+  if (telegram) updatedObj.telegram = telegram;
+  if (instagram) updatedObj.instagram = instagram;
+  if (email) updatedObj.email = email;
+  if (website) updatedObj.website = website;
+  if (guildId) updatedObj.guildId = guildId;
+  if (steward) updatedObj.steward = steward;
+  if (personType) updatedObj.personType = personType;
+  if (activityType) updatedObj.activityType = activityType;
+  if (isicCode) updatedObj.isicCode = isicCode;
+  if (postalCode) updatedObj.postalCode = postalCode;
+  if (guildOwnerName) updatedObj.guildOwnerName = guildOwnerName;
+  if (guildOwnerFamily) updatedObj.guildOwnerFamily = guildOwnerFamily;
+  if (identificationCode) updatedObj.identificationCode = identificationCode;
+  if (nationalCode) updatedObj.nationalCode = nationalCode;
+  if (ownerFatherName) updatedObj.ownerFatherName = ownerFatherName;
+  if (waterPlaque) updatedObj.waterPlaque = waterPlaque;
+  if (registrationPlaque) updatedObj.registrationPlaque = registrationPlaque;
 
-    guildOwnerName,
-    guildOwnerFamily,
-    identificationCode,
-    nationalCode,
-    ownerFatherName,
-
-    waterPlaque,
-    registrationPlaque
-  };
   if (membershipFeeDate) updatedObj.membershipFeeDate = membershipFeeDate;
   if (issueDate) updatedObj.issueDate = issueDate;
   if (expirationDate) updatedObj.expirationDate = expirationDate;
