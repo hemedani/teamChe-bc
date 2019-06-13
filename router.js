@@ -313,4 +313,7 @@ module.exports = app => {
   // count methods
   app.get("/api/center/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.centersCount);
   app.get("/api/user/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.usersCount);
+
+  // ======================= {{ Fixed Method Sections }} ================================================================
+  app.get("/api/fixed/centers/otagh/bazargani", CenterController.fixOtaghBazargani);
 };

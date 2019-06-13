@@ -1456,6 +1456,21 @@ exports.fixCenterFullPath = (_, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
+exports.fixOtaghBazargani = (_, res) => {
+  Center.find()
+    .exec()
+    .then(async fundedCenters => {
+      const fixedCenters = await Promise.all(
+        fundedCenters.map(eachCenter => {
+          eachCenter.otaghBazargani = "5cff9a5a321a524904eb8fba";
+          return eachCenter.save().then(eachCenterSaved => eachCenterSaved);
+        })
+      );
+      return res.send({ fixedCentersLength: fixedCenters.length, fixedCenters });
+    })
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
+
 // db.createUser( { user: "SydAdmin", pwd: "1195Blue20Shah509@#5543MahSOS", roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ] })
 
 // db.createUser( { user: "TeamCheAdmin", pwd: "Blue1195ShahBottle509", roles: [ { role: "readWrite", db: "TeamChe" }, { role: "read", db: "reporting" } ] })
