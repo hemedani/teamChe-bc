@@ -9,6 +9,12 @@ const fs = require("fs");
 exports.addEtehadiye = (req, res) => {
   // console.log("req.body az addEtehadiye EtehadiyeController", req.body);
 
+  if (req.user.asOrganization) {
+    if (!req.user.asOrganization.equals(req.user.asOrganization)) {
+      return res.status(422).send({ error: "you can not do this" });
+    }
+  }
+
   let {
     name,
     enName,
@@ -55,7 +61,8 @@ exports.addEtehadiye = (req, res) => {
 exports.Etehadiyes = (req, res) => {
   let query = {};
 
-  const { _id, path, city, state } = req.query;
+  const { _id, path, city, state, limit = 30 } = req.query;
+
   _id ? (query._id = { $lt: mongoose.Types.ObjectId(_id) }) : (query._id = { $lt: mongoose.Types.ObjectId() });
   if (path) query.fullPath = { $regex: path };
   if (city) query.city = city;
@@ -64,7 +71,7 @@ exports.Etehadiyes = (req, res) => {
   if (req.user.asOrganization) query.otaghAsnaf = req.user.asOrganization;
 
   Etehadiye.find(query)
-    .limit(15)
+    .limit(limit)
     .sort({ _id: -1 })
     .exec()
     .then(etehadiyes => res.json({ etehadiyes }))
@@ -74,11 +81,36 @@ exports.Etehadiyes = (req, res) => {
 exports.updateEtehadiye = (req, res) => {
   // console.log("req.body az updateEtehadiye", req.body);
 
-  const { _id, name, enName, credit } = req.body;
+  const {
+    _id,
+    name,
+    enName,
+    code,
+    otaghAsnaf,
+    otaghBazargani,
+    city,
+    state,
+    parish,
+    address,
+    text,
+    lat,
+    lng,
+    credit
+  } = req.body;
+  address.text = text;
 
   let updateObj = {};
   if (name) updateObj.name = name;
   if (enName) updateObj.enName = enName;
+  if (code) updateObj.code = code;
+
+  if (otaghAsnaf) updateObj.otaghAsnaf = otaghAsnaf;
+  if (otaghBazargani) updateObj.otaghBazargani = otaghBazargani;
+  if (city) updateObj.city = city;
+  if (state) updateObj.state = state;
+  if (parish) updateObj.parish = parish;
+  if (address) updateObj.address = address;
+  if (lat && lng) updateObj.location = { type: "Point", coordinates: [lng, lat] };
 
   if (_.includes(req.user.level, "tarah") || _.includes(req.user.level, "admin")) {
     if (credit) updateObj.credit = credit;

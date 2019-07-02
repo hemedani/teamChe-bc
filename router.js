@@ -153,15 +153,16 @@ module.exports = app => {
   app.post("/api/parish/update", jsonParser, requireAuth, ParishController.updateParish);
   app.get("/api/parish/repair", ParishController.repairParish);
 
+  // TODO check organization id with sended otagh asnag id (req.user.asOrganization with req.body.otaghAsnaf in checklevel.chechAsOrg) ==================
   // ======================= {{ rastes Sections }} ================================================================
   app.get("/api/rastes", jsonParser, requireAuth, RasteController.Rastes);
-  app.post("/api/raste/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, RasteController.addRaste);
-  app.post("/api/raste/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, RasteController.updateRaste);
-  app.post("/api/raste/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, RasteController.removeRaste);
+  app.post("/api/raste/add", jsonParser, requireAuth, CheckLevel.checkAsOrg, RasteController.addRaste);
+  app.post("/api/raste/update", jsonParser, requireAuth, CheckLevel.checkAsOrg, RasteController.updateRaste);
+  app.post("/api/raste/remove", jsonParser, requireAuth, CheckLevel.checkAsOrg, RasteController.removeRaste);
 
   // ======================= {{ etehadiyes Sections }} ================================================================
   app.get("/api/etehadiyes", jsonParser, requireAuth, EtehadiyeController.Etehadiyes);
-  app.post("/api/etehadiye/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.addEtehadiye);
+  app.post("/api/etehadiye/add", jsonParser, requireAuth, CheckLevel.checkAsOrg, EtehadiyeController.addEtehadiye);
   app.post(
     "/api/etehadiye/add/officer",
     jsonParser,
@@ -169,17 +170,17 @@ module.exports = app => {
     CheckLevel.ckeckAdmin,
     EtehadiyeController.addOfficerToEtehadiye
   );
-  app.post("/api/etehadiye/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.updateEtehadiye);
+  app.post("/api/etehadiye/update", jsonParser, requireAuth, CheckLevel.checkAsOrg, EtehadiyeController.updateEtehadiye);
   app.put(
     "/api/etehadiye/change/pic",
     jsonParser,
     requireAuth,
-    CheckLevel.ckeckAdmin,
+    CheckLevel.checkAsOrg,
     uploadWithExt.single("file"),
     FileController.uploadMiddleware,
     EtehadiyeController.changeEtehadiyePic
   );
-  app.post("/api/etehadiye/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.removeEtehadiye);
+  app.post("/api/etehadiye/remove", jsonParser, requireAuth, CheckLevel.checkAsOrg, EtehadiyeController.removeEtehadiye);
 
   // ======================= {{ otaghAsnafs Sections }} ================================================================
   app.get("/api/otaghAsnafs", jsonParser, OtaghAsnafController.OtaghAsnafs);

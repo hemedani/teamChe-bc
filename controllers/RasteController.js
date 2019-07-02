@@ -39,7 +39,7 @@ exports.Rastes = (req, res) => {
   if (req.user.etOrganization) query.etehadiye = req.user.etOrganization;
 
   Raste.find(query)
-    .limit(15)
+    .limit(30)
     .sort({ _id: -1 })
     .exec()
     .then(rastes => res.json({ rastes }))
@@ -49,9 +49,9 @@ exports.Rastes = (req, res) => {
 exports.updateRaste = (req, res) => {
   // console.log('req.body az yourRaste', req.body)
 
-  const { _id, name, enName, isic } = req.body;
+  const { _id, name, enName, isic, etehadiye, otaghAsnaf } = req.body;
 
-  Raste.findOneAndUpdate({ _id: _id }, { name: name, enName: enName, isic }, { new: true })
+  Raste.findOneAndUpdate({ _id }, { name, enName, isic, etehadiye, otaghAsnaf }, { new: true })
     .exec()
     .then(RasteUpdated => res.json({ raste: RasteUpdated }))
     .catch(err => res.status(422).json({ error: "did not saved", err }));

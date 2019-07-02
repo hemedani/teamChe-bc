@@ -71,8 +71,9 @@ exports.updateParish = (req, res) => {
 };
 
 exports.removeParish = (req, res) => {
-  console.log("req.body az removeParish :", req.body);
-  Parish.findOneAndDelete({ _id: req.body._id })
+  // console.log("req.body az removeParish :", req.body);
+  const { _id } = req.body;
+  Parish.findOneAndDelete({ _id })
     .exec()
     .then(parish => res.send({ msg: "removed succesfully", parish }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));

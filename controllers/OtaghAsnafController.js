@@ -43,40 +43,34 @@ exports.OtaghAsnafs = (req, res) => {
 };
 
 exports.updateOtaghAsnaf = (req, res) => {
-  // console.log('req.body az yourOtaghAsnaf', req.body)
+  // console.log("==================");
+  // console.log("req.body", req.body);
+  // console.log("==================");
 
-  const { _id, name, enName } = req.body;
+  const { _id, name, enName, otaghBazargani, city, parish, state, address, text, lat, lng } = req.body;
+  address.text = text;
 
-  OtaghAsnaf.findOneAndUpdate({ _id: _id }, { name: name, enName: enName })
+  OtaghAsnaf.findOneAndUpdate(
+    { _id },
+    {
+      name,
+      name,
+      enName,
+
+      otaghBazargani,
+
+      city,
+      state,
+      parish,
+
+      address,
+      location: { type: "Point", coordinates: [lng, lat] }
+    },
+    { new: true }
+  )
     .exec()
-    .then(OtaghAsnafUpdated => {
-      // console.log('OtaghAsnafUpdated.enName ', OtaghAsnafUpdated)
-
-      let OtaghAsnaf = { _id: OtaghAsnafUpdated._id, name: name, enName: enName, pic: OtaghAsnafUpdated.pic };
-
-      Center.find({ OtaghAsnafsRef: OtaghAsnaf._id })
-        .exec()
-        .then(CenterFinded => {
-          // let Centers = CenterFinded._doc;
-          // console.log('az to Center.find updateOtaghAsnaf', Centers);
-          if (CenterFinded.length > 0) {
-            Promise.all(
-              CenterFinded.map(Center => {
-                Center.OtaghAsnafsEnName = Center.OtaghAsnafsEnName.filter(en => en !== OtaghAsnafUpdated.enName);
-                Center.OtaghAsnafs = Center.OtaghAsnafs.filter(ct => ct.enName !== OtaghAsnafUpdated.enName);
-
-                Center.OtaghAsnafsEnName.push(OtaghAsnaf.enName);
-                Center.OtaghAsnafs.push(OtaghAsnaf);
-
-                return Center.save().then(CenterSaved => CenterSaved);
-              })
-            ).then(resp => res.json({ OtaghAsnaf: OtaghAsnaf, CenterLength: resp.length }));
-          } else {
-            return res.json({ OtaghAsnaf: OtaghAsnaf, CenterLength: 0 });
-          }
-        });
-    })
-    .catch(err => res.status(422).json({ error: "did not saved" }));
+    .then(OtaghAsnafUpdated => res.json({ otaghAsnaf: OtaghAsnafUpdated }))
+    .catch(err => res.status(422).json({ error: "did not saved", err }));
 };
 
 exports.getOtaghAsnaf = (req, res) => {
@@ -146,11 +140,13 @@ exports.addOperatorAs = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 exports.removeOtaghAsnaf = (req, res) => {
-  // console.log('req.body az removeOtaghAsnaf :', req.body);
-  OtaghAsnaf.findOneAndDelete(req.body._id)
+  console.log("==================");
+  console.log("req.body", req.body);
+  console.log("==================");
+  const { _id } = req.body;
+
+  OtaghAsnaf.findOneAndDelete({ _id })
     .exec()
     .then(removedOtaghAsnaf => res.json({ otaghAsnaf: removedOtaghAsnaf }))
-    .catch(err => {
-      return res.status(422).send({ error: "anjam neshod" });
-    });
+    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
 };

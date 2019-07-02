@@ -85,11 +85,13 @@ exports.updateOtaghBazargani = (req, res) => {
 };
 
 exports.removeOtaghBazargani = (req, res) => {
-  // console.log('req.body az removeOtaghBazargani :', req.body);
-  OtaghBazargani.findOneAndDelete(req.body._id)
+  // console.log("==================");
+  // console.log("req.body", req.body);
+  // console.log("==================");
+  const { _id } = req.body;
+
+  OtaghBazargani.findOneAndDelete({ _id })
     .exec()
     .then(removedOtaghBazargani => res.json({ otaghBazargani: removedOtaghBazargani }))
-    .catch(err => {
-      return res.status(422).send({ error: "anjam neshod" });
-    });
+    .catch(err => res.status(422).send({ error: "anjam neshod", err }));
 };
