@@ -64,6 +64,7 @@ const CenterSchema = new Schema(
     postalCode: Number,
 
     guildOwnerName: String,
+    guildDegree: String,
     guildOwnerFamily: String,
     guildOwnerPhoneNumber: Number,
     identificationCode: Number,
@@ -77,6 +78,9 @@ const CenterSchema = new Schema(
     membershipFeeDate: Date,
 
     etPic: String,
+
+    guildStatus: { type: String, enum: ["inProgress", "sendedDocument", "registered"] },
+
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
     otaghAsnaf: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },

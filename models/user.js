@@ -44,7 +44,6 @@ const userSchema = new Schema(
           "admin",
           "storekeeper",
           "delivery",
-          "organic.bossEt",
           "organic.veep",
           "organic.officer",
           "organic.administrationManager",
@@ -59,7 +58,12 @@ const userSchema = new Schema(
           "organic.accountant",
 
           "organic.operatorEt",
-          "organic.operatorAs"
+          "organic.bossEt",
+          "organic.officerEt",
+
+          "organic.operatorAs",
+          "organic.bossAs",
+          "organic.officerAs"
         ],
         default: ["normal"]
       }
@@ -68,11 +72,10 @@ const userSchema = new Schema(
     ownCenter: { type: Schema.Types.ObjectId, ref: "Center" },
     pic: String,
     fcmToken: String,
-    officerEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
-    operatorEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
-    bossEt: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
 
-    operatorAs: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },
+    etOrganization: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
+
+    asOrganization: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },
 
     picRef: { type: Schema.Types.ObjectId, ref: "File" }
   },

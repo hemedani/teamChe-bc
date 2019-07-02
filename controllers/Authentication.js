@@ -52,9 +52,6 @@ exports.loginWithMob = (req, res) => {
       let respone = {};
       if (process.env.ENVIREMENT === "development") {
         respone.code = code;
-        console.log("==================");
-        console.log("your code is ", code);
-        console.log("==================");
       }
 
       if (user) {
@@ -188,7 +185,7 @@ exports.acceptKey = (req, res) => {
   // console.log("req.body from acceptKey Authentication", req.body);
   // console.log("==================");
   User.findOne({ phone: req.body.phone })
-    .select("fcmToken authCode phone name familyName officerEt level pic")
+    .select("fcmToken authCode phone name familyName etOrganization asOrganization level pic")
     .exec()
     .then(userPey => {
       if (req.body.fcmToken !== userPey.fcmToken) {
@@ -205,8 +202,7 @@ exports.acceptKey = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have a issue!", err }));
 };
 
-exports.getOwnUser = (req, res, next) => {
-  // console.log('req.user az bigiKhodam', req.user);
+exports.getOwnUser = (req, res) => {
   if (req.user) {
     return res.send({ user: req.user });
   } else {

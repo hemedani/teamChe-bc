@@ -7,7 +7,7 @@ const Center = require("../models/Center");
 exports.addRaste = (req, res) => {
   // console.log('req.body az addRaste RasteController', req.body);
 
-  const { name, enName, etehadiye, isic } = req.body;
+  const { name, enName, etehadiye, otaghAsnaf, isic } = req.body;
 
   const raste = new Raste({
     name,
@@ -15,6 +15,7 @@ exports.addRaste = (req, res) => {
     isic,
 
     etehadiye,
+    otaghAsnaf,
 
     creator: req.user._id
   });
@@ -34,10 +35,12 @@ exports.Rastes = (req, res) => {
   if (req.query.name) query = { ...query, name: { $regex: req.query.name } };
   if (req.query.etehadiye) query = { ...query, etehadiye };
 
-  // console.log("==================");
-  // console.log("query from Rastes", query, req.query);
-  // console.log("==================");
+  if (req.user.asOrganization) query.otaghAsnaf = req.user.asOrganization;
+  if (req.user.etOrganization) query.etehadiye = req.user.etOrganization;
+
   Raste.find(query)
+    .limit(15)
+    .sort({ _id: -1 })
     .exec()
     .then(rastes => res.json({ rastes }))
     .catch(err => res.status(422).send({ error: "We have an issues", err }));

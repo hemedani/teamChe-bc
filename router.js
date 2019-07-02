@@ -62,7 +62,7 @@ module.exports = app => {
   app.post("/api/user/remove", jsonParser, requireAuth, Authentication.removeUser);
 
   app.get("/api/users", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.users);
-  app.get("/api/user/getown", jsonParser, requireAuth, Authentication.getOwnUser);
+  app.get("/api/user/getown", requireAuth, Authentication.getOwnUser);
   app.get("/api/users/withlevel", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.getUsersWithLevel);
   app.post("/api/user/editown", jsonParser, requireAuth, Authentication.editOwnUser);
   app.post("/api/user/add/address", jsonParser, requireAuth, Authentication.addAddressToUser);
@@ -154,13 +154,13 @@ module.exports = app => {
   app.get("/api/parish/repair", ParishController.repairParish);
 
   // ======================= {{ rastes Sections }} ================================================================
-  app.get("/api/rastes", jsonParser, RasteController.Rastes);
+  app.get("/api/rastes", jsonParser, requireAuth, RasteController.Rastes);
   app.post("/api/raste/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, RasteController.addRaste);
   app.post("/api/raste/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, RasteController.updateRaste);
   app.post("/api/raste/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, RasteController.removeRaste);
 
   // ======================= {{ etehadiyes Sections }} ================================================================
-  app.get("/api/etehadiyes", jsonParser, EtehadiyeController.Etehadiyes);
+  app.get("/api/etehadiyes", jsonParser, requireAuth, EtehadiyeController.Etehadiyes);
   app.post("/api/etehadiye/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, EtehadiyeController.addEtehadiye);
   app.post(
     "/api/etehadiye/add/officer",
@@ -183,11 +183,19 @@ module.exports = app => {
 
   // ======================= {{ otaghAsnafs Sections }} ================================================================
   app.get("/api/otaghAsnafs", jsonParser, OtaghAsnafController.OtaghAsnafs);
+  app.get("/api/get/otagh/asnaf", jsonParser, OtaghAsnafController.getOtaghAsnaf);
   app.post("/api/otaghAsnaf/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.addOtaghAsnaf);
   app.post("/api/otaghAsnaf/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.updateOtaghAsnaf);
+  app.post(
+    "/api/otaghAsnaf/add/operator",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    OtaghAsnafController.addOperatorAs
+  );
   app.post("/api/otaghAsnaf/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.removeOtaghAsnaf);
 
-  // ======================= {{ otaghAsnafs Sections }} ================================================================
+  // ======================= {{ reports Sections }} ================================================================
   app.get("/api/reports", jsonParser, ReportController.reports);
   app.get("/api/report", jsonParser, ReportController.report);
   app.post("/api/report/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ReportController.addReport);

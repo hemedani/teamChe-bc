@@ -31,11 +31,22 @@ exports.checkOfficer = (req, res, next) => {
   // console.log("==================");
   // console.log("req.user CheckLevel.checkOfficer ", req.user);
   // console.log("==================");
+  // "organic.operatorEt",
+  // "organic.bossEt",
+  // "organic.officerEt",
 
+  // "organic.operatorAs",
+  // "organic.bossAs",
+  // "organic.officerAs"
   if (
     _.includes(req.user.level, "tarah") ||
     _.includes(req.user.level, "admin") ||
-    _.includes(req.user.level, "organic.boss") ||
+    _.includes(req.user.level, "organic.operatorEt") ||
+    _.includes(req.user.level, "organic.bossEt") ||
+    _.includes(req.user.level, "organic.officerEt") ||
+    _.includes(req.user.level, "organic.bossAs") ||
+    _.includes(req.user.level, "organic.operatorAs") ||
+    _.includes(req.user.level, "organic.officerAs") ||
     _.includes(req.user.level, "organic.officer")
   ) {
     return next();

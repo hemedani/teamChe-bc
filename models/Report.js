@@ -3,7 +3,13 @@ const Schema = mongoose.Schema;
 
 const ReportSchema = new Schema(
   {
+    subject: String,
     text: String,
+
+    clause: { type: Number, enum: [27, 28] },
+
+    pic: String,
+    picRef: { type: Schema.Types.ObjectId, ref: "File" },
 
     center: { type: Schema.Types.ObjectId, ref: "Center" },
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },

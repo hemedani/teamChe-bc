@@ -22,6 +22,7 @@ const OtaghAsnafSchema = new Schema(
     pic: String,
     picRef: { type: Schema.Types.ObjectId, ref: "File" },
 
+    operators: [{ type: Schema.Types.ObjectId, ref: "User" }],
     creator: { type: Schema.Types.ObjectId, ref: "User" }
   },
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }

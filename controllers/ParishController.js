@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Parish = require("../models/Parish");
 const Etehadiye = require("../models/Etehadiye");
+const OtaghAsnaf = require("../models/OtaghAsnaf");
 
 exports.addParish = (req, res) => {
   // console.log("req.body az addParish ParishController", req.body);
@@ -31,18 +32,17 @@ exports.parishes = async (req, res) => {
   if (city) query.city = city;
   if (state) query.state = state;
 
-  const getEtCity = async etId => {
-    const et = await Etehadiye.findById(etId).exec();
-    return (query.city = et.city);
+  const getCity = async (id, org) => {
+    let organization = {};
+    if (org === "Et") organization = await Etehadiye.findById(id).exec();
+    if (org === "As") organization = await OtaghAsnaf.findById(id).exec();
+    organization.city ? (query.city = organization.city) : null;
+    return query;
   };
 
-  if (req.user.officerEt || req.user.operatorEt || req.user.bossEt)
-    await getEtCity(req.user.officerEt || req.user.operatorEt || req.user.bossEt);
+  if (req.user.etOrganization) await getCity(req.user.etOrganization, "Et");
 
-  // console.log("==================");
-  // console.log("query from parishes", query, req.query);
-  // console.log("==================");
-
+  if (req.user.asOrganization) await getCity(req.user.asOrganization, "As");
   Parish.find(query)
     .limit(15)
     .sort({ _id: -1 })

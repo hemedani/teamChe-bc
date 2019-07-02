@@ -9,6 +9,7 @@ const RasteSchema = new Schema(
     isic: Number,
 
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },
+    otaghAsnaf: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },
 
     creator: { type: Schema.Types.ObjectId, ref: "User" }
   },

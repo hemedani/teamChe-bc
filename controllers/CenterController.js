@@ -8,6 +8,7 @@ const Raste = require("../models/Raste");
 const Rate = require("../models/Rate");
 const Ware = require("../models/Ware");
 const City = require("../models/City");
+const Etehadiye = require("../models/Etehadiye");
 const exRate = require("../service/exRate").exRate;
 
 const download = require("image-downloader");
@@ -147,7 +148,14 @@ exports.addCenter = async (req, res) => {
 
   center
     .save()
-    .then(centerSaved => res.json({ center: centerSaved }))
+    .then(async savedCenter => {
+      const etCenterCount = await Center.countDocuments({ etehadiye: savedCenter.etehadiye });
+
+      if (Number(etCenterCount) > 20) {
+        await Etehadiye.findOneAndUpdate({ _id: savedCenter.etehadiye }, { $inc: { credit: -10000 } }).exec();
+      }
+      return res.json({ center: savedCenter });
+    })
     .catch(err => res.status(422).send({ error: "We have an issues", err }));
 };
 
@@ -171,7 +179,7 @@ exports.fixCity = (req, res) => {
 };
 
 exports.centersCount = async (_, res) => {
-  const count = await Center.find().countDocuments();
+  const count = await Center.countDocuments();
   return res.send({ CentersCount: count });
 };
 
@@ -391,6 +399,9 @@ exports.protectedCenters = (req, res) => {
   req.query.online == "true" || req.query.online === true ? (query.online = req.query.online) : (query = query);
   req.query.city ? (query.cityName = req.query.city) : (query = query);
 
+  if (req.user.asOrganization) query.otaghAsnaf = req.user.asOrganization;
+  if (req.user.etOrganization) query.etehadiye = req.user.etOrganization;
+
   req.query.name ? (query = { ...query, name: { $regex: req.query.name } }) : (query = query);
   req.query.enName ? (query = { ...query, enName: { $regex: req.query.enName } }) : (query = query);
   req.query.address ? (query = { ...query, address: { $regex: req.query.address } }) : (query = query);
@@ -439,7 +450,7 @@ exports.protectedCenters = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
-exports.getCentersWithParams = function(req, res, next) {
+exports.getCentersWithParams = (req, res) => {
   // console.log('req.query az getCentersWithParams', req.query);
   // console.log('=======================');
 
@@ -778,6 +789,7 @@ exports.addBusinessLicense = (req, res) => {
     isicCode,
     postalCode,
     guildOwnerName,
+    guildDegree,
     guildOwnerFamily,
     identificationCode,
     nationalCode,
@@ -789,31 +801,29 @@ exports.addBusinessLicense = (req, res) => {
     guildOwnerPhoneNumber
   } = req.body;
 
-  Center.findOneAndUpdate(
-    { _id },
-    {
-      licensePic,
-      licensePicRef,
-      issueDate,
-      expirationDate,
-      steward,
-      personType,
-      activityType,
-      isicCode,
-      postalCode,
-      guildOwnerName,
-      guildOwnerFamily,
-      identificationCode,
-      nationalCode,
-      ownerFatherName,
-      ownerBirthDate,
-      waterPlaque,
-      registrationPlaque,
-      membershipFeeDate,
-      guildOwnerPhoneNumber
-    },
-    { new: true }
-  )
+  let updateObj = {};
+  if (licensePic) updateObj.licensePic = licensePic;
+  if (licensePicRef) updateObj.licensePicRef = licensePicRef;
+  if (issueDate) updateObj.issueDate = issueDate;
+  if (expirationDate) updateObj.expirationDate = expirationDate;
+  if (steward) updateObj.steward = steward;
+  if (personType) updateObj.personType = personType;
+  if (activityType) updateObj.activityType = activityType;
+  if (isicCode) updateObj.isicCode = isicCode;
+  if (postalCode) updateObj.postalCode = postalCode;
+  if (guildOwnerName) updateObj.guildOwnerName = guildOwnerName;
+  if (guildDegree) updateObj.guildDegree = guildDegree;
+  if (guildOwnerFamily) updateObj.guildOwnerFamily = guildOwnerFamily;
+  if (identificationCode) updateObj.identificationCode = identificationCode;
+  if (nationalCode) updateObj.nationalCode = nationalCode;
+  if (ownerFatherName) updateObj.ownerFatherName = ownerFatherName;
+  if (ownerBirthDate) updateObj.ownerBirthDate = ownerBirthDate;
+  if (waterPlaque) updateObj.waterPlaque = waterPlaque;
+  if (registrationPlaque) updateObj.registrationPlaque = registrationPlaque;
+  if (membershipFeeDate) updateObj.membershipFeeDate = membershipFeeDate;
+  if (guildOwnerPhoneNumber) updateObj.guildOwnerPhoneNumber = guildOwnerPhoneNumber;
+
+  Center.findOneAndUpdate({ _id }, updateObj, { new: true })
     .then(updatedCenter => res.send({ center: updatedCenter }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
@@ -1225,20 +1235,23 @@ exports.setOwner = (req, res, next) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
-exports.removeCenter = (req, res, next) => {
+exports.removeCenter = (req, res) => {
   // console.log('req.body az removeCenter :', req.body);
-  Center.findByIdAndRemove(req.body.id)
+
+  Center.findById(req.body.id)
     .exec()
-    .then(centerRemoved => {
-      // console.log('centerRemoved az exports.removeCenter CenterController', centerRemoved)
-      Rate.remove({ center: centerRemoved._id }).then(ratesRemoved => {
-        // console.log('ratesRemoved az exports.removeCenter CenterController', ratesRemoved)
-      });
-      Ware.remove({ center: centerRemoved._id }).then(waresRemoved => {
-        // console.log('waresRemoved az exports.removeCenter CenterController', waresRemoved)
-      });
-      return res.send("ba movafghiyat hazf shod");
+    .then(async foundedCenter => {
+      const etCenterCount = await Center.countDocuments({ etehadiye: foundedCenter.etehadiye });
+
+      if (Number(etCenterCount) > 20) {
+        await Etehadiye.findOneAndUpdate({ _id: foundedCenter.etehadiye }, { $inc: { credit: 10000 } }).exec();
+      }
+
+      Center.deleteOne({ _id: req.body.id })
+        .exec()
+        .then(removedCenter => res.send("ba movafghiyat hazf shod"));
     })
+
     .catch(err => res.status(422).send({ error: "we have an issues" }));
 };
 

@@ -6,6 +6,7 @@ const EtehadiyeSchema = new Schema(
     name: String,
     enName: String,
     code: Number,
+    credit: { type: Number, default: 0 },
 
     otaghAsnaf: { type: Schema.Types.ObjectId, ref: "OtaghAsnaf" },
     otaghBazargani: { type: Schema.Types.ObjectId, ref: "OtaghBazargani" },

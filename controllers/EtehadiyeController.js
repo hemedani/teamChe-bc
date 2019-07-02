@@ -52,47 +52,41 @@ exports.addEtehadiye = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
-exports.Etehadiyes = (_, res) => {
-  Etehadiye.find()
+exports.Etehadiyes = (req, res) => {
+  let query = {};
+
+  const { _id, path, city, state } = req.query;
+  _id ? (query._id = { $lt: mongoose.Types.ObjectId(_id) }) : (query._id = { $lt: mongoose.Types.ObjectId() });
+  if (path) query.fullPath = { $regex: path };
+  if (city) query.city = city;
+  if (state) query.state = state;
+
+  if (req.user.asOrganization) query.otaghAsnaf = req.user.asOrganization;
+
+  Etehadiye.find(query)
+    .limit(15)
+    .sort({ _id: -1 })
     .exec()
     .then(etehadiyes => res.json({ etehadiyes }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };
 
 exports.updateEtehadiye = (req, res) => {
-  // console.log('req.body az yourEtehadiye', req.body)
+  // console.log("req.body az updateEtehadiye", req.body);
 
-  const { _id, name, enName } = req.body;
+  const { _id, name, enName, credit } = req.body;
 
-  Etehadiye.findOneAndUpdate({ _id: _id }, { name: name, enName: enName })
+  let updateObj = {};
+  if (name) updateObj.name = name;
+  if (enName) updateObj.enName = enName;
+
+  if (_.includes(req.user.level, "tarah") || _.includes(req.user.level, "admin")) {
+    if (credit) updateObj.credit = credit;
+  }
+
+  Etehadiye.findOneAndUpdate({ _id }, updateObj, { new: true })
     .exec()
-    .then(EtehadiyeUpdated => {
-      // console.log('EtehadiyeUpdated.enName ', EtehadiyeUpdated)
-
-      let Etehadiye = { _id: EtehadiyeUpdated._id, name: name, enName: enName, pic: EtehadiyeUpdated.pic };
-
-      Center.find({ EtehadiyesRef: Etehadiye._id })
-        .exec()
-        .then(CenterFinded => {
-          // let Centers = CenterFinded._doc;
-          // console.log('az to Center.find updateEtehadiye', Centers);
-          if (CenterFinded.length > 0) {
-            Promise.all(
-              CenterFinded.map(Center => {
-                Center.EtehadiyesEnName = Center.EtehadiyesEnName.filter(en => en !== EtehadiyeUpdated.enName);
-                Center.Etehadiyes = Center.Etehadiyes.filter(ct => ct.enName !== EtehadiyeUpdated.enName);
-
-                Center.EtehadiyesEnName.push(Etehadiye.enName);
-                Center.Etehadiyes.push(Etehadiye);
-
-                return Center.save().then(CenterSaved => CenterSaved);
-              })
-            ).then(resp => res.json({ Etehadiye: Etehadiye, CenterLength: resp.length }));
-          } else {
-            return res.json({ Etehadiye: Etehadiye, CenterLength: 0 });
-          }
-        });
-    })
+    .then(EtehadiyeUpdated => res.json({ etehadiye: EtehadiyeUpdated }))
     .catch(err => res.status(422).json({ error: "did not saved", err }));
 };
 
@@ -131,9 +125,9 @@ exports.addOfficerToEtehadiye = (req, res) => {
       const availableUser = await User.find({ _id: { $in: usersId } });
 
       const sortedAvailableUserByEt = availableUser.reduce((pValue, cValue) => {
-        if (cValue.officerEt) {
-          pValue[cValue.officerEt] = pValue[cValue.officerEt] || [];
-          pValue[cValue.officerEt].push(cValue._id);
+        if (cValue.etOrganization) {
+          pValue[cValue.etOrganization] = pValue[cValue.etOrganization] || [];
+          pValue[cValue.etOrganization].push(cValue._id);
         }
         return pValue;
       }, {});
@@ -152,15 +146,15 @@ exports.addOfficerToEtehadiye = (req, res) => {
       const clearEts = await Promise.all(promises);
 
       await Promise.all(
-        findedEt.officers.map(ofId => User.findOneAndUpdate({ _id: ofId }, { officerEt: null }, { new: true }))
+        findedEt.officers.map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null }, { new: true }))
       );
 
-      await Promise.all(usersId.map(ofId => User.findOneAndUpdate({ _id: ofId }, { officerEt: null }, { new: true })));
+      await Promise.all(usersId.map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null }, { new: true })));
 
       const updatedEt = await Etehadiye.findOneAndUpdate({ _id }, { officers: usersId }, { new: true });
 
       const updatedUsers = await Promise.all(
-        usersId.map(userId => User.findOneAndUpdate({ _id: userId }, { officerEt: _id }, { new: true }))
+        usersId.map(userId => User.findOneAndUpdate({ _id: userId }, { etOrganization: _id }, { new: true }))
       );
 
       return res.json({ etehadiye: updatedEt, users: updatedUsers, updatedEts: clearEts });

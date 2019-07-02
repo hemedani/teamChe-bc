@@ -9,7 +9,7 @@ const localLogin = new localStrategy({ usernameField: "email" }, (email, pass, d
   let loEmail = email.toLowerCase();
   User.findOne(
     { email: loEmail },
-    "_id email name familyName phone password address level pic fcmToken officerEt phoneValidate"
+    "_id email name familyName phone password address level pic fcmToken etOrganization asOrganization phoneValidate"
   )
     .exec()
     .then(us => {
