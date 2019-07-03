@@ -61,7 +61,7 @@ const CenterSchema = new Schema(
     personType: String,
     activityType: String,
     isicCode: Number,
-    postalCode: Number,
+    postalCode: { type: Number, unique: true },
 
     guildOwnerName: String,
     guildDegree: String,
@@ -79,7 +79,11 @@ const CenterSchema = new Schema(
 
     etPic: String,
 
-    guildStatus: { type: String, enum: ["inProgress", "sendedDocument", "registered"] },
+    guildStatus: { type: String, enum: ["warning27", "applicant", "shutdownPromise"] },
+
+    warning27Date: Date,
+    applicantDate: Date,
+    shutdownPromiseDate: Date,
 
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },

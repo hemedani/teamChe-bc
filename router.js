@@ -325,4 +325,5 @@ module.exports = app => {
 
   // ======================= {{ Fixed Method Sections }} ================================================================
   app.get("/api/fixed/centers/otagh/bazargani", CenterController.fixOtaghBazargani);
+  app.get("/api/fixed/centers/otagh/asnaf", CenterController.fixOtaghAsnafForCenter);
 };
