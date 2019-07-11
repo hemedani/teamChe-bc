@@ -45,7 +45,6 @@ const userSchema = new Schema(
           "storekeeper",
           "delivery",
           "organic.veep",
-          "organic.officer",
           "organic.administrationManager",
           "organic.publicRelations",
           "organic.support",

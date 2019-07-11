@@ -6,8 +6,6 @@ const crypto = require("crypto");
 const multer = require("multer");
 
 const Authentication = require("./controllers/Authentication");
-const FileController = require("./controllers/FileController");
-const CenterController = require("./controllers/CenterController");
 const CityController = require("./controllers/CityController");
 const ParishController = require("./controllers/ParishController");
 const WareTypeController = require("./controllers/WareTypeController");
@@ -25,13 +23,16 @@ const DeliveryController = require("./controllers/DeliveryController");
 const StateController = require("./controllers/StateController");
 
 const RasteController = require("./controllers/RasteController");
-const EtehadiyeController = require("./controllers/EtehadiyeController");
 const OtaghAsnafController = require("./controllers/OtaghAsnafController");
 const OtaghBazarganiController = require("./controllers/OtaghBazarganiController");
 
 const ReportController = require("./controllers/ReportController");
 
 const CheckLevel = require("./service/CheckLevel");
+
+const { centerRoutes } = require("./controllers/center");
+const { fileRoutes } = require("./controllers/file");
+const { etehadiyeRoutes } = require("./controllers/etehadiye");
 
 const storage = multer.diskStorage({
   destination: "./pic/orginal/",
@@ -73,73 +74,9 @@ module.exports = app => {
   app.post("/api/user/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.removeUser);
   app.post("/api/users/withsearch", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.getUsersWithSearch);
 
-  app.put("/api/upload", requireAuth, uploadWithExt.single("file"), FileController.upload);
-  app.put("/api/change/raste/pic", requireAuth, uploadWithExt.single("file"), FileController.changeRastePic);
-  app.put("/api/change/waretype/pic", requireAuth, uploadWithExt.single("file"), FileController.changeWareTypePic);
-  // app.put('/change/center/pic', requireAuth, uploadWithExt.single( 'file' ), FileController.changeCenterPic)
-  app.put("/api/change/option/pic", requireAuth, uploadWithExt.single("file"), FileController.changeOptionPic);
-  app.put("/api/change/user/pic", requireAuth, uploadWithExt.single("file"), FileController.changeUserPic);
-
-  // ======================= {{ center Sections }} ================================================================
-  app.get("/api/centers", jsonParser, CenterController.centers);
-  app.get("/api/protected/centers", jsonParser, requireAuth, CheckLevel.checkOfficer, CenterController.protectedCenters);
-  app.get("/api/center", jsonParser, CenterController.center);
-  app.get("/api/center/edited", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.getEditedCenter);
-  app.post(
-    "/api/center/set/location",
-    jsonParser,
-    requireAuth,
-    CheckLevel.checkOfficer,
-    CenterController.setLocationForCenter
-  );
-  app.post(
-    "/api/center/update/protected",
-    jsonParser,
-    requireAuth,
-    CheckLevel.checkOfficer,
-    CenterController.updateProtectedCenter
-  );
-  app.get("/api/centers/params", jsonParser, CenterController.getCentersWithParams);
-  app.post("/api/center/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addCenter);
-  app.post("/api/center/add/pic", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addPicToCenter);
-  app.post(
-    "/api/center/add/business/license",
-    jsonParser,
-    requireAuth,
-    CheckLevel.ckeckAdmin,
-    CenterController.addBusinessLicense
-  );
-  app.post("/api/center/edit", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.updateCenter);
-  app.post("/api/center/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.removeCenter);
-  app.post("/api/center/setexpertrate", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.setExpertRate);
-  app.post("/api/center/addqualityrate", jsonParser, requireAuth, CenterController.addQualityRate);
-  app.post("/api/center/addpricerate", jsonParser, requireAuth, CenterController.addPriceRate);
-  app.post("/api/center/addsalesmanrate", jsonParser, requireAuth, CenterController.addSalesmanRate);
-  app.post("/api/center/addoptiontocenter", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.addOptions);
-  app.post("/api/center/set/address", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.setOtherAddresses);
-  app.post("/api/center/set/owner", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.setOwner);
-  app.post("/api/center/set/like", jsonParser, requireAuth, CenterController.setCenterLikes);
-  app.post("/api/center/delete/pic", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.deletePicCenter);
-  app.get("/api/center/fix/other/address", jsonParser, CenterController.fixOtherAddressId);
-  app.post(
-    "/center/remove/other/address",
-    jsonParser,
-    requireAuth,
-    CheckLevel.ckeckAdmin,
-    CenterController.removeAOtherAddFromCenter
-  );
-  app.put(
-    "/api/center/add/one/pic",
-    jsonParser,
-    requireAuth,
-    CheckLevel.ckeckAdmin,
-    uploadWithExt.single("file"),
-    FileController.uploadMiddleware,
-    CenterController.addOnePicToCenter
-  );
-  app.get("/api/centers/fix/office/doctors", jsonParser, CenterController.fixOfficDocters);
-  app.get("/api/centers/fix/static/map", jsonParser, CenterController.fixedStaticMaps);
-  app.get("/api/centers/fix/full/path", jsonParser, CenterController.fixCenterFullPath);
+  centerRoutes(app, jsonParser, requireAuth, CheckLevel, uploadWithExt);
+  fileRoutes(app, requireAuth, uploadWithExt);
+  etehadiyeRoutes(app, jsonParser, requireAuth, CheckLevel, uploadWithExt);
 
   // ======================= {{ city Sections }} ================================================================
   app.get("/api/cities", jsonParser, CityController.cities);
@@ -159,28 +96,6 @@ module.exports = app => {
   app.post("/api/raste/add", jsonParser, requireAuth, CheckLevel.checkAsOrg, RasteController.addRaste);
   app.post("/api/raste/update", jsonParser, requireAuth, CheckLevel.checkAsOrg, RasteController.updateRaste);
   app.post("/api/raste/remove", jsonParser, requireAuth, CheckLevel.checkAsOrg, RasteController.removeRaste);
-
-  // ======================= {{ etehadiyes Sections }} ================================================================
-  app.get("/api/etehadiyes", jsonParser, requireAuth, EtehadiyeController.Etehadiyes);
-  app.post("/api/etehadiye/add", jsonParser, requireAuth, CheckLevel.checkAsOrg, EtehadiyeController.addEtehadiye);
-  app.post(
-    "/api/etehadiye/add/officer",
-    jsonParser,
-    requireAuth,
-    CheckLevel.ckeckAdmin,
-    EtehadiyeController.addOfficerToEtehadiye
-  );
-  app.post("/api/etehadiye/update", jsonParser, requireAuth, CheckLevel.checkAsOrg, EtehadiyeController.updateEtehadiye);
-  app.put(
-    "/api/etehadiye/change/pic",
-    jsonParser,
-    requireAuth,
-    CheckLevel.checkAsOrg,
-    uploadWithExt.single("file"),
-    FileController.uploadMiddleware,
-    EtehadiyeController.changeEtehadiyePic
-  );
-  app.post("/api/etehadiye/remove", jsonParser, requireAuth, CheckLevel.checkAsOrg, EtehadiyeController.removeEtehadiye);
 
   // ======================= {{ otaghAsnafs Sections }} ================================================================
   app.get("/api/otaghAsnafs", jsonParser, OtaghAsnafController.OtaghAsnafs);
@@ -317,13 +232,9 @@ module.exports = app => {
   app.post("/api/state/update", jsonParser, requireAuth, StateController.updateState);
   app.post("/api/state/remove", jsonParser, requireAuth, StateController.removeState);
 
-  app.get("/api/read/file", jsonParser, FileController.testReadFile);
-
   // count methods
-  app.get("/api/center/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, CenterController.centersCount);
+
   app.get("/api/user/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, Authentication.usersCount);
 
   // ======================= {{ Fixed Method Sections }} ================================================================
-  app.get("/api/fixed/centers/otagh/bazargani", CenterController.fixOtaghBazargani);
-  app.get("/api/fixed/centers/otagh/asnaf", CenterController.fixOtaghAsnafForCenter);
 };

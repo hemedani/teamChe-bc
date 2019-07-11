@@ -67,6 +67,17 @@ exports.checkOperatorEt = (req, res, next) => {
   }
 };
 
+exports.onlyOfficerEt = (req, res, next) => {
+  // console.log("==================");
+  // console.log("req.user CheckLevel.checkAdmin ", req.user);
+  // console.log("==================");
+  if (_.includes(req.user.level, "organic.officerEt")) {
+    return next();
+  } else {
+    return res.status(500).send({ error: "you not have enough access right" });
+  }
+};
+
 exports.checkOfficer = (req, res, next) => {
   // console.log("==================");
   // console.log("req.user CheckLevel.checkOfficer ", req.user);

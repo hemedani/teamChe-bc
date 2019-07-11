@@ -79,11 +79,41 @@ const CenterSchema = new Schema(
 
     etPic: String,
 
-    guildStatus: { type: String, enum: ["warning27", "applicant", "shutdownPromise"] },
+    guildStatus: {
+      type: String,
+      enum: [
+        "warning27",
+        "shutdownPromise",
+        "applicant",
+        "offerDoc",
+        "commissionConfirm",
+        "directorAccept",
+        "docInquiry",
+        "paySettle",
+        "payElectronicCard",
+        "issueLicense",
+        "receiveLicense",
+        "plump"
+      ]
+    },
 
     warning27Date: Date,
-    applicantDate: Date,
     shutdownPromiseDate: Date,
+    applicantDate: Date,
+    offerDocDate: Date,
+    commissionConfirmDate: Date,
+    directorAcceptDate: Date,
+    docInquiryDate: Date,
+    paySettleDate: Date,
+    payElectronicCardDate: Date,
+    receiveLicenseDate: Date,
+    plumpDate: Date,
+
+    offerDocs: [String],
+    offerDocsRef: [{ type: Schema.Types.ObjectId, ref: "File" }],
+
+    inquiryDocs: [String],
+    inquiryDocsRef: [{ type: Schema.Types.ObjectId, ref: "File" }],
 
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },
     etehadiye: { type: Schema.Types.ObjectId, ref: "Etehadiye" },

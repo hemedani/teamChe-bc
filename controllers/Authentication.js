@@ -51,6 +51,10 @@ exports.loginWithMob = (req, res) => {
 
       let respone = {};
       if (process.env.ENVIREMENT === "development") {
+        console.log("==================");
+        console.log("code from login with mobb", code);
+        console.log("==================");
+
         respone.code = code;
       }
 
@@ -435,7 +439,7 @@ exports.usersCount = async (req, res) => {
   return res.send({ UsersCount: count });
 };
 
-exports.addUser = function(req, res, next) {
+exports.addUser = (req, res) => {
   console.log("req.body addUser Authentication", req.body);
 
   let { name, familyName, email, expertise, address, password, doctor, level, phone, phoneValidate } = req.body;
