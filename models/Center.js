@@ -94,7 +94,8 @@ const CenterSchema = new Schema(
         "issueLicense",
         "receiveLicense",
         "plump"
-      ]
+      ],
+      default: "receiveLicense"
     },
 
     warning27Date: Date,

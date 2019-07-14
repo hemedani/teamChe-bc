@@ -6,6 +6,7 @@ const {
   fixCenterFullPath,
   fixOtaghBazargani,
   fixOtaghAsnafForCenter,
+  fixGuildStatus,
   fixCity
 } = require("./CenterFixes");
 const { centersCount, centers, getCentersWithParams, center, getEditedCenter } = require("./GettingCenters");
@@ -103,6 +104,7 @@ exports.centerRoutes = (app, jsonParser, requireAuth, CheckLevel, uploadWithExt)
   app.get("/api/centers/fix/full/path", jsonParser, fixCenterFullPath);
   app.get("/api/fixed/centers/otagh/bazargani", fixOtaghBazargani);
   app.get("/api/fixed/centers/otagh/asnaf", fixOtaghAsnafForCenter);
+  app.get("/api/fixed/centers/guild/status", fixGuildStatus);
 
   app.get("/api/center/get/count", jsonParser, requireAuth, CheckLevel.ckeckAdmin, centersCount);
 };

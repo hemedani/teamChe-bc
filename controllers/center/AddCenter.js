@@ -1,6 +1,8 @@
 const Center = require("../../models/Center");
 const Etehadiye = require("../../models/Etehadiye");
 const Report = require("../../models/Report");
+const State = require("../../models/State");
+const City = require("../../models/City");
 
 const Utils = require("./utils/CenterUtils");
 
@@ -176,7 +178,7 @@ exports.addOptions = (req, res) => {
 };
 
 exports.addCenterByOfficer = async (req, res) => {
-  const {
+  let {
     name,
     personType,
     activityType,
@@ -186,19 +188,24 @@ exports.addCenterByOfficer = async (req, res) => {
     ownerFatherName,
     nationalCode,
     guildOwnerPhoneNumbers,
-    raste
+    raste,
+    parish,
+    address,
+    lat,
+    lng
   } = req.body;
-  console.log("==================");
-  console.log("req.body from addCenterByOfficer", req.body, req.user);
-  console.log("==================");
 
   const foundedEt = await Etehadiye.findById(req.user.etOrganization).exec();
-  console.log("==================");
-  console.log("foundedEt", foundedEt);
-  console.log("==================");
 
   if (foundedEt) {
     const { _id, otaghAsnaf, otaghBazargani, city, state, pic } = foundedEt;
+
+    const foundedState = await State.findById(state).exec();
+    const foundedCity = await City.findById(city).exec();
+
+    address.state = foundedState.name;
+    address.city = foundedCity.name;
+
     let center = new Center({
       name,
       personType,
@@ -213,6 +220,10 @@ exports.addCenterByOfficer = async (req, res) => {
       warning27Date: new Date(),
 
       raste,
+      parish,
+      address,
+      fullPath: `${name}, ${address.state} - ${address.city} - ${address.parish} - ${address.text}`,
+      location: { type: "Point", coordinates: [lng, lat] },
 
       otaghAsnaf,
       otaghBazargani,
@@ -221,7 +232,22 @@ exports.addCenterByOfficer = async (req, res) => {
       etPic: pic,
       etehadiye: _id
     });
-    const newReport = new Report({});
+    center.staticMap = await updateStaticMap(lat, lng);
+    const report = new Report({
+      subject: "اخطار ماده ۲۷",
+      text: "این اخطار صرفا جهت آزمایش نوشته شده است",
+      raste,
+      etehadiye: _id,
+      otaghAsnaf,
+      otaghBazargani,
+      state,
+      city,
+      parish,
+      center: center._id,
+      creator: req.user._id
+    });
+
+    await report.save();
     center
       .save()
       .then(savedCenter => res.json({ center: savedCenter }))

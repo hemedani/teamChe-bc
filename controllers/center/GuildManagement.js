@@ -34,6 +34,7 @@ exports.protectedCenters = (req, res) => {
   req.query.address ? (query = { ...query, address: { $regex: req.query.address } }) : (query = query);
   req.query.etehadiye ? (query = { ...query, etehadiye: req.query.etehadiye }) : (query = query);
   if (req.query.text) query = { ...query, fullPath: { $regex: req.query.text } };
+  if (req.query.guildStatus) query.guildStatus = req.query.guildStatus;
   if (req.query.geo) {
     const geo = JSON.parse(req.query.geo);
     if (geo.coordinates) {

@@ -175,3 +175,18 @@ exports.fixCity = (_, res) => {
       }
     });
 };
+
+exports.fixGuildStatus = (_, res) => {
+  Center.find()
+    .exec()
+    .then(async fundedCenters => {
+      const fixedCenters = await Promise.all(
+        fundedCenters.map(eachCenter => {
+          eachCenter.guildStatus = "receiveLicense";
+          return eachCenter.save().then(eachCenterSaved => eachCenterSaved);
+        })
+      );
+      return res.send({ fixedCentersLength: fixedCenters.length, fixedCenters });
+    })
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
