@@ -94,7 +94,7 @@ exports.centerRoutes = (app, jsonParser, requireAuth, CheckLevel, uploadWithExt)
     "/api/center/add/one/pic",
     jsonParser,
     requireAuth,
-    CheckLevel.ckeckAdmin,
+    CheckLevel.checkOrg,
     uploadWithExt.single("file"),
     uploadMiddleware,
     addOnePicToCenter

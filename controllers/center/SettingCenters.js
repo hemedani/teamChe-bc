@@ -9,9 +9,27 @@ const Utils = require("./utils/CenterUtils");
 const { updateStaticMap } = Utils;
 
 exports.addOnePicToCenter = (req, res) => {
-  Center.findOneAndUpdate({ _id: req.body._id }, { $push: { pics: req.pic.name, picsRef: req.pic._id } }, { new: true })
+  const { data } = req.body;
+  const { whichPic, _id } = JSON.parse(data);
+  let updateObj = {};
+
+  if (whichPic === "centerPics") updateObj = { pics: req.pic.name, picsRef: req.pic._id };
+  if (whichPic === "offerDocs") updateObj = { offerDocs: req.pic.name, offerDocsRef: req.pic._id };
+  if (whichPic === "inquiryDocs") updateObj = { inquiryDocs: req.pic.name, inquiryDocsRef: req.pic._id };
+
+  console.log("==================");
+  console.log("updateObj", updateObj);
+  console.log("==================");
+
+  Center.findOneAndUpdate({ _id }, { $push: updateObj }, { new: true })
     .exec()
-    .then(updatedCenter => res.send({ center: updatedCenter }));
+    .then(updatedCenter => {
+      console.log("==================");
+      console.log("updateCenter", updatedCenter);
+      console.log("==================");
+
+      res.send({ center: updatedCenter });
+    });
 };
 exports.updateCenter = async (req, res) => {
   // console.log("req.body az updateCenter CenterController", req.body);

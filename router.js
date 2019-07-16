@@ -26,13 +26,12 @@ const RasteController = require("./controllers/RasteController");
 const OtaghAsnafController = require("./controllers/OtaghAsnafController");
 const OtaghBazarganiController = require("./controllers/OtaghBazarganiController");
 
-const ReportController = require("./controllers/ReportController");
-
 const CheckLevel = require("./service/CheckLevel");
 
 const { centerRoutes } = require("./controllers/center");
 const { fileRoutes } = require("./controllers/file");
 const { etehadiyeRoutes } = require("./controllers/etehadiye");
+const { reportRoutes } = require("./controllers/report");
 
 const storage = multer.diskStorage({
   destination: "./pic/orginal/",
@@ -77,6 +76,7 @@ module.exports = app => {
   centerRoutes(app, jsonParser, requireAuth, CheckLevel, uploadWithExt);
   fileRoutes(app, requireAuth, uploadWithExt);
   etehadiyeRoutes(app, jsonParser, requireAuth, CheckLevel, uploadWithExt);
+  reportRoutes(app, jsonParser, requireAuth, CheckLevel);
 
   // ======================= {{ city Sections }} ================================================================
   app.get("/api/cities", jsonParser, CityController.cities);
@@ -101,7 +101,13 @@ module.exports = app => {
   app.get("/api/otaghAsnafs", jsonParser, OtaghAsnafController.OtaghAsnafs);
   app.get("/api/get/otagh/asnaf", jsonParser, OtaghAsnafController.getOtaghAsnaf);
   app.post("/api/otaghAsnaf/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.addOtaghAsnaf);
-  app.post("/api/otaghAsnaf/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.updateOtaghAsnaf);
+  app.post(
+    "/api/otaghAsnaf/update",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    OtaghAsnafController.updateOtaghAsnaf
+  );
   app.post(
     "/api/otaghAsnaf/add/operator",
     jsonParser,
@@ -109,13 +115,13 @@ module.exports = app => {
     CheckLevel.ckeckAdmin,
     OtaghAsnafController.addOperatorAs
   );
-  app.post("/api/otaghAsnaf/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, OtaghAsnafController.removeOtaghAsnaf);
-
-  // ======================= {{ reports Sections }} ================================================================
-  app.get("/api/reports", jsonParser, ReportController.reports);
-  app.get("/api/report", jsonParser, ReportController.report);
-  app.post("/api/report/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ReportController.addReport);
-  app.post("/api/report/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, ReportController.removeReport);
+  app.post(
+    "/api/otaghAsnaf/remove",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    OtaghAsnafController.removeOtaghAsnaf
+  );
 
   // ======================= {{ otaghBazarganis Sections }} ================================================================
   app.get("/api/otaghBazarganis", jsonParser, OtaghBazarganiController.OtaghBazarganis);
@@ -157,8 +163,20 @@ module.exports = app => {
 
   // ======================= {{ Inspection Sections }} ================================================================
   app.post("/api/inspection/add", jsonParser, requireAuth, CheckLevel.checkOfficer, InspectionController.addInspection);
-  app.get("/api/inspection/inspections", jsonParser, requireAuth, CheckLevel.checkOfficer, InspectionController.inspections);
-  app.get("/api/inspection/inspection", jsonParser, requireAuth, CheckLevel.checkOfficer, InspectionController.inspection);
+  app.get(
+    "/api/inspection/inspections",
+    jsonParser,
+    requireAuth,
+    CheckLevel.checkOfficer,
+    InspectionController.inspections
+  );
+  app.get(
+    "/api/inspection/inspection",
+    jsonParser,
+    requireAuth,
+    CheckLevel.checkOfficer,
+    InspectionController.inspection
+  );
 
   // ======================= {{ Options Sections }} ================================================================
   app.get("/api/options", jsonParser, OptionController.options);
@@ -170,16 +188,46 @@ module.exports = app => {
   app.get("/api/option/ware/options", jsonParser, WareOptionController.wareOptions);
   app.get("/api/option/ware/option", jsonParser, WareOptionController.wareOption);
   app.post("/api/option/ware/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, WareOptionController.addWareOption);
-  app.post("/api/option/ware/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, WareOptionController.updateWareOption);
-  app.post("/api/option/ware/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, WareOptionController.removeWareOption);
+  app.post(
+    "/api/option/ware/update",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    WareOptionController.updateWareOption
+  );
+  app.post(
+    "/api/option/ware/remove",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    WareOptionController.removeWareOption
+  );
 
   // ======================= {{ Promotion Sections }} ================================================================
   app.get("/api/promotions", jsonParser, PromotionController.promotions);
   app.get("/api/yourPromotion", jsonParser, PromotionController.yourPromotion);
-  app.get("/api/promotion/paginate", jsonParser, requireAuth, CheckLevel.ckeckAdmin, PromotionController.promotionsPaginate);
+  app.get(
+    "/api/promotion/paginate",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    PromotionController.promotionsPaginate
+  );
   app.post("/api/promotion/add", jsonParser, requireAuth, CheckLevel.ckeckAdmin, PromotionController.addPromotion);
-  app.post("/api/promotion/update", jsonParser, requireAuth, CheckLevel.ckeckAdmin, PromotionController.updatePromotion);
-  app.post("/api/promotion/remove", jsonParser, requireAuth, CheckLevel.ckeckAdmin, PromotionController.removePromotion);
+  app.post(
+    "/api/promotion/update",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    PromotionController.updatePromotion
+  );
+  app.post(
+    "/api/promotion/remove",
+    jsonParser,
+    requireAuth,
+    CheckLevel.ckeckAdmin,
+    PromotionController.removePromotion
+  );
 
   // ======================= {{ Massages Sections }} ================================================================
   app.get("/api/massages", jsonParser, requireAuth, CheckLevel.ckeckAdmin, MassageController.massages);

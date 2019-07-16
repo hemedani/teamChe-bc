@@ -1,31 +1,5 @@
-const mongoose = require("mongoose");
-const Report = require("../models/Report");
-
-exports.addReport = (req, res) => {
-  // console.log("==================");
-  // console.log("req.body from addReport", req.body);
-  // console.log("==================");
-
-  const { subject, text, raste, etehadiye, otaghAsnaf, otaghBazargani, state, city, parish, center } = req.body;
-  const report = new Report({
-    subject,
-    text,
-    raste,
-    etehadiye,
-    otaghAsnaf,
-    otaghBazargani,
-    state,
-    city,
-    parish,
-    center,
-    creator: req.user._id
-  });
-
-  report
-    .save()
-    .then(reportSaved => res.json({ report: reportSaved }))
-    .catch(err => res.status(422).send({ error: "we have an issues", err }));
-};
+const Report = require("../../models/Report");
+const _ = require("lodash");
 
 exports.reports = (req, res) => {
   let query = {};
@@ -40,6 +14,11 @@ exports.reports = (req, res) => {
   if (req.query.parish) query.parish = req.query.parish;
   if (req.query.creator) query.creator = req.query.creator;
 
+  if (req.user.asOrganization) query.otaghAsnaf = req.user.asOrganization;
+  if (req.user.etOrganization) query.etehadiye = req.user.etOrganization;
+
+  if (_.includes(req.user.level, "organic.officerEt")) query.creator = req.user._id;
+
   Report.find(query)
     .exec()
     .then(reports => res.json({ reports }))
@@ -53,13 +32,5 @@ exports.report = (req, res) => {
     .populate("center raste etehadiye otaghAsnaf otaghBazargani state city parish creator")
     .exec()
     .then(report => res.json({ report }))
-    .catch(err => res.status(422).send({ error: "we have an issues", err }));
-};
-
-exports.removeReport = (req, res) => {
-  // console.log("req.body az removeReport :", req.body);
-  Report.findByIdAndRemove(req.body._id)
-    .exec()
-    .then(report => res.send({ msg: "removed succesfully", report }))
     .catch(err => res.status(422).send({ error: "we have an issues", err }));
 };

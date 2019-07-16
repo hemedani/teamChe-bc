@@ -97,8 +97,24 @@ exports.checkOfficer = (req, res, next) => {
     _.includes(req.user.level, "organic.officerEt") ||
     _.includes(req.user.level, "organic.bossAs") ||
     _.includes(req.user.level, "organic.operatorAs") ||
-    _.includes(req.user.level, "organic.officerAs") ||
-    _.includes(req.user.level, "organic.officer")
+    _.includes(req.user.level, "organic.officerAs")
+  ) {
+    return next();
+  } else {
+    return res.status(500).send({ error: "you not have enough access right" });
+  }
+};
+
+exports.allOrganic = (req, res, next) => {
+  if (
+    _.includes(req.user.level, "tarah") ||
+    _.includes(req.user.level, "admin") ||
+    _.includes(req.user.level, "organic.operatorEt") ||
+    _.includes(req.user.level, "organic.bossEt") ||
+    _.includes(req.user.level, "organic.officerEt") ||
+    _.includes(req.user.level, "organic.bossAs") ||
+    _.includes(req.user.level, "organic.operatorAs") ||
+    _.includes(req.user.level, "organic.officerAs")
   ) {
     return next();
   } else {
