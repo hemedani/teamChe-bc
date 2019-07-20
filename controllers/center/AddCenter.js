@@ -4,6 +4,8 @@ const Report = require("../../models/Report");
 const State = require("../../models/State");
 const City = require("../../models/City");
 
+const SendSMS = require("../../service/SendSMS");
+
 const Utils = require("./utils/CenterUtils");
 
 const { updateStaticMap } = Utils;
@@ -187,7 +189,7 @@ exports.addCenterByOfficer = async (req, res) => {
     guildOwnerFamily,
     ownerFatherName,
     nationalCode,
-    guildOwnerPhoneNumbers,
+    guildOwnerPhoneNumber,
     raste,
     parish,
     address,
@@ -215,7 +217,7 @@ exports.addCenterByOfficer = async (req, res) => {
       guildOwnerFamily,
       ownerFatherName,
       nationalCode,
-      guildOwnerPhoneNumbers,
+      guildOwnerPhoneNumber,
       guildStatus: "warning27",
       warning27Date: new Date(),
 
@@ -246,6 +248,15 @@ exports.addCenterByOfficer = async (req, res) => {
       center: center._id,
       creator: req.user._id
     });
+
+    const phoneNumbers = [guildOwnerPhoneNumber];
+
+    if (process.env.ENVIREMENT === "production") {
+      SendSMS.sendCustomMsg(
+        phoneNumbers,
+        "یک اخطار برای تشکیل پرونده در اتحادیه پوشاک برای شما ایجاد شد لطفا به اتحادیه مراجعه کنید"
+      );
+    }
 
     await report.save();
     center

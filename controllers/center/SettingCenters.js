@@ -17,19 +17,9 @@ exports.addOnePicToCenter = (req, res) => {
   if (whichPic === "offerDocs") updateObj = { offerDocs: req.pic.name, offerDocsRef: req.pic._id };
   if (whichPic === "inquiryDocs") updateObj = { inquiryDocs: req.pic.name, inquiryDocsRef: req.pic._id };
 
-  console.log("==================");
-  console.log("updateObj", updateObj);
-  console.log("==================");
-
   Center.findOneAndUpdate({ _id }, { $push: updateObj }, { new: true })
     .exec()
-    .then(updatedCenter => {
-      console.log("==================");
-      console.log("updateCenter", updatedCenter);
-      console.log("==================");
-
-      res.send({ center: updatedCenter });
-    });
+    .then(updatedCenter => res.send({ center: updatedCenter }));
 };
 exports.updateCenter = async (req, res) => {
   // console.log("req.body az updateCenter CenterController", req.body);
