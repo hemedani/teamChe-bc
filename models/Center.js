@@ -108,6 +108,7 @@ const CenterSchema = new Schema(
     paySettleDate: Date,
     payElectronicCardDate: Date,
     receiveLicenseDate: Date,
+    issueLicenseDate: Date,
     plumpDate: Date,
 
     offerDocs: [String],

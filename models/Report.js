@@ -5,11 +5,16 @@ const ReportSchema = new Schema(
   {
     subject: String,
     text: String,
+    fileNumber: Number,
 
-    clause: { type: Number, enum: [27, 28] },
+    clause: { type: Number, enum: [23, 26, 27, 28] },
+    isOwnerPresent: Boolean,
+    numberOfEmployee: Number,
 
-    pic: String,
-    picRef: { type: Schema.Types.ObjectId, ref: "File" },
+    bossEtProve: { type: Boolean, default: false },
+    officersEtCommissionProve: { type: Boolean, default: false },
+    officerEtProve: { type: Boolean, default: false },
+    secondOfficerEtProve: { type: Boolean, default: false },
 
     center: { type: Schema.Types.ObjectId, ref: "Center" },
     raste: { type: Schema.Types.ObjectId, ref: "Raste" },

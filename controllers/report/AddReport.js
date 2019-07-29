@@ -5,10 +5,29 @@ exports.addReport = (req, res) => {
   // console.log("req.body from addReport", req.body);
   // console.log("==================");
 
-  const { subject, text, raste, etehadiye, otaghAsnaf, otaghBazargani, state, city, parish, center } = req.body;
-  const report = new Report({
-    subject,
+  const {
     text,
+    subject,
+    numberOfEmployee,
+    isOwnerPresent,
+    clause,
+    fileNumber,
+    raste,
+    etehadiye,
+    otaghAsnaf,
+    otaghBazargani,
+    state,
+    city,
+    parish,
+    center
+  } = req.body;
+  const report = new Report({
+    text,
+    subject,
+    numberOfEmployee,
+    isOwnerPresent,
+    clause,
+    fileNumber,
     raste,
     etehadiye,
     otaghAsnaf,

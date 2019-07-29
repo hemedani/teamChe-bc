@@ -259,6 +259,7 @@ exports.addCenterByOfficer = async (req, res) => {
     }
 
     await report.save();
+
     center
       .save()
       .then(savedCenter => res.json({ center: savedCenter }))
