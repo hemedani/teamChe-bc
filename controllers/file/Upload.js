@@ -2,7 +2,7 @@ const sizeOf = require("image-size");
 const File = require("../../models/File");
 const resizeSharp = require("./utils/Sharp").resizeSharp;
 
-exports.upload = (req, res) => {
+exports.upload = async (req, res) => {
   if (!req.file.mimetype.startsWith("image/")) {
     return res.status(422).json({
       error: "The uploaded file must be an image"
@@ -19,7 +19,7 @@ exports.upload = (req, res) => {
 
   const pic = new File({ name: req.file.filename, picType: req.file.mimetype, uploader: req.user._id });
 
-  resizeSharp(req.file.filename);
+  await resizeSharp(req.file.filename);
 
   pic
     .save()

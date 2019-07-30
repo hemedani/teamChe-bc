@@ -3,7 +3,7 @@ const Raste = require("../../models/Raste");
 const File = require("../../models/File");
 const resizeSharp = require("./utils/Sharp").resizeSharp;
 
-exports.changeRastePic = (req, res) => {
+exports.changeRastePic = async (req, res) => {
   console.log("req.body az fileController", req.body);
 
   if (!req.file.mimetype.startsWith("image/")) {
@@ -16,7 +16,7 @@ exports.changeRastePic = (req, res) => {
 
   const pic = new File({ name: req.file.filename, picType: req.file.mimetype, uploader: req.user._id });
 
-  resizeSharp(req.file.filename);
+  await resizeSharp(req.file.filename);
 
   pic
     .save()

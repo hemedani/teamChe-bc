@@ -3,7 +3,7 @@ const User = require("../../models/user");
 const File = require("../../models/File");
 const resizeSharp = require("./utils/Sharp").resizeSharp;
 
-exports.changeUserPic = (req, res, next) => {
+exports.changeUserPic = async (req, res) => {
   // console.log('req.user az fileController', req.user)
   console.log("req.body az fileController", req.body);
   // console.log('req.file az fileController', req.file)
@@ -23,7 +23,7 @@ exports.changeUserPic = (req, res, next) => {
   // }
 
   const pic = new File({ name: req.file.filename, picType: req.file.mimetype, uploader: req.user._id });
-  resizeSharp(req.file.filename);
+  await resizeSharp(req.file.filename);
 
   pic
     .save()
