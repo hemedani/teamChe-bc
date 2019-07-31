@@ -1,4 +1,7 @@
 const Report = require("../../models/Report");
+const Center = require("../../models/Center");
+const Etehadiye = require("../../models/Etehadiye");
+const SendSMS = require("../../service/SendSMS");
 
 exports.addReport = (req, res) => {
   // console.log("==================");
@@ -21,7 +24,7 @@ exports.addReport = (req, res) => {
     parish,
     center
   } = req.body;
-  const report = new Report({
+  let report = new Report({
     text,
     subject,
     numberOfEmployee,
@@ -38,6 +41,25 @@ exports.addReport = (req, res) => {
     center,
     creator: req.user._id
   });
+
+  if (_.includes(req.user.level, "organic.officerEt")) {
+    report.officerEtProve = true;
+  }
+
+  if (process.env.ENVIREMENT === "production") {
+    Center.findById(center)
+      .exec()
+      .then(async foundedCenter => {
+        if (foundedCenter.guildOwnerPhoneNumber) {
+          const foundedEt = await Etehadiye.findById(etehadiye);
+
+          SendSMS.sendCustomMsg(
+            [foundedCenter.guildOwnerPhoneNumber],
+            `یک اخطار با موضوع ${subject} در اتحادیه ${foundedEt.name} برای شما ثبت شده است`
+          );
+        }
+      });
+  }
 
   report
     .save()
