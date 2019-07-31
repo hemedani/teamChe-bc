@@ -101,6 +101,7 @@ exports.updateProtectedCenter = (req, res) => {
     activityType,
     isicCode,
     postalCode,
+    guildOwnerPhoneNumber,
 
     guildOwnerName,
     guildOwnerFamily,
@@ -130,6 +131,7 @@ exports.updateProtectedCenter = (req, res) => {
   if (activityType) updatedObj.activityType = activityType;
   if (isicCode) updatedObj.isicCode = isicCode;
   if (postalCode) updatedObj.postalCode = postalCode;
+  if (guildOwnerPhoneNumber) updatedObj.guildOwnerPhoneNumber = guildOwnerPhoneNumber;
   if (guildOwnerName) updatedObj.guildOwnerName = guildOwnerName;
   if (guildOwnerFamily) updatedObj.guildOwnerFamily = guildOwnerFamily;
   if (identificationCode) updatedObj.identificationCode = identificationCode;
