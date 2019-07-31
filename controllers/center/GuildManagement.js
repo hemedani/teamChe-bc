@@ -1,4 +1,5 @@
 const Center = require("../../models/Center");
+const phoneMobile = require("../../service/telephone").phoneMobile;
 
 exports.protectedCenters = (req, res) => {
   // console.log("==================");
@@ -131,7 +132,14 @@ exports.updateProtectedCenter = (req, res) => {
   if (activityType) updatedObj.activityType = activityType;
   if (isicCode) updatedObj.isicCode = isicCode;
   if (postalCode) updatedObj.postalCode = postalCode;
-  if (guildOwnerPhoneNumber) updatedObj.guildOwnerPhoneNumber = guildOwnerPhoneNumber;
+  if (guildOwnerPhoneNumber) {
+    guildOwnerPhoneNumber = phoneMobile(guildOwnerPhoneNumber);
+    console.log("==================");
+    console.log("guildOwnerPhoneNumber", guildOwnerPhoneNumber);
+    console.log("==================");
+
+    if (guildOwnerPhoneNumber !== "number is not valid") updatedObj.guildOwnerPhoneNumber = guildOwnerPhoneNumber;
+  }
   if (guildOwnerName) updatedObj.guildOwnerName = guildOwnerName;
   if (guildOwnerFamily) updatedObj.guildOwnerFamily = guildOwnerFamily;
   if (identificationCode) updatedObj.identificationCode = identificationCode;

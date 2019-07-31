@@ -2,6 +2,7 @@ const Report = require("../../models/Report");
 const Center = require("../../models/Center");
 const Etehadiye = require("../../models/Etehadiye");
 const SendSMS = require("../../service/SendSMS");
+const _ = require("lodash");
 
 exports.addReport = (req, res) => {
   // console.log("==================");
@@ -55,7 +56,7 @@ exports.addReport = (req, res) => {
 
           SendSMS.sendCustomMsg(
             [foundedCenter.guildOwnerPhoneNumber],
-            `یک اخطار با موضوع ${subject} در اتحادیه ${foundedEt.name} برای شما ثبت شده است`
+            `یک اخطار با موضوع ${subject} در ${foundedEt.name} برای شما ثبت شده است`
           );
         }
       });
