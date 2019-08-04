@@ -63,7 +63,11 @@ exports.protectedCenters = (req, res) => {
     }
   }
 
-  if (req.query.sort) sort = JSON.parse(req.query.sort);
+  if (req.query.sort) {
+    sort = JSON.parse(req.query.sort);
+    if (sort.membershipFeeDate) query = { ...query, membershipFeeDate: { $ne: null } };
+    if (sort.expirationDate) query = { ...query, expirationDate: { $ne: null } };
+  }
   if (req.query.page) page = req.query.page;
 
   // console.log("==================");
@@ -134,10 +138,6 @@ exports.updateProtectedCenter = (req, res) => {
   if (postalCode) updatedObj.postalCode = postalCode;
   if (guildOwnerPhoneNumber) {
     guildOwnerPhoneNumber = phoneMobile(guildOwnerPhoneNumber);
-    console.log("==================");
-    console.log("guildOwnerPhoneNumber", guildOwnerPhoneNumber);
-    console.log("==================");
-
     if (guildOwnerPhoneNumber !== "number is not valid") updatedObj.guildOwnerPhoneNumber = guildOwnerPhoneNumber;
   }
   if (guildOwnerName) updatedObj.guildOwnerName = guildOwnerName;

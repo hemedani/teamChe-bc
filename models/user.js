@@ -47,6 +47,7 @@ const userSchema = new Schema(
           "organic.operatorEt",
           "organic.bossEt",
           "organic.officerEt",
+          "organic.officersEtCommission",
 
           "organic.operatorAs",
           "organic.bossAs",
