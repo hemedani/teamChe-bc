@@ -1,7 +1,4 @@
 const Report = require("../../models/Report");
-const Center = require("../../models/Center");
-const Etehadiye = require("../../models/Etehadiye");
-const SendSMS = require("../../service/SendSMS");
 const _ = require("lodash");
 
 exports.updateReport = (req, res) => {
@@ -30,15 +27,23 @@ exports.setProveForReport = (req, res) => {
   Report.findOne({ _id })
     .exec()
     .then(foundedRp => {
-      if (user.level.include("organic.bossEt")) foundedRp.bossEtProve = true;
-      if (user.level.include("organic.officersEtCommission")) foundedRp.officersEtCommissionProve = true;
-      if (user.level.include("organic.officerEt")) {
-        if (foundedRp.creator === user._id) {
-          foundedRp.officerEtProve = true;
-        } else {
-          foundedRp.secondOfficerEtProve = true;
+      if (user.etOrganization) {
+        if (!foundedRp.etehadiye.equals(user.etOrganization)) {
+          return res.status(500).send({ msg: "مشکلی در امضاء بازرسی به وجود آمده است", err });
         }
-        foundedRp.save().then(savedRp => res.send({ report: savedRp }));
+        if (_.include(user.level, "organic.bossEt")) foundedRp.bossEtProve = true;
+        if (_.include(user.level, "organic.officersEtCommission")) foundedRp.officersEtCommissionProve = true;
+        if (_.include(user.level, "organic.officerEt")) {
+          if (foundedRp.creator.equals(user._id)) {
+            foundedRp.officerEtProve = true;
+          } else {
+            foundedRp.secondOfficerEtProve = true;
+          }
+          foundedRp.save().then(savedRp => res.send({ report: savedRp }));
+        }
+      } else {
+        // TODO just return some err response until implement the right logic for handle asOrganization too ==================
+        return res.status(500).send({ msg: "مشکلی در امضاء بازرسی به وجود آمده است", err });
       }
     })
     .catch(err => res.status(500).send({ msg: "مشکلی در امضاء بازرسی به وجود آمده است", err }));

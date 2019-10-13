@@ -21,7 +21,8 @@ mongoose.connect(
     reconnectTries: Number.MAX_VALUE,
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
   }
 );
 

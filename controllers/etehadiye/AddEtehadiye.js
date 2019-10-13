@@ -59,7 +59,7 @@ exports.addOfficerToEtehadiye = (req, res) => {
 
   Etehadiye.findById(_id)
     .exec()
-    .then(async findedEt => {
+    .then(async foundedEt => {
       const availableUser = await User.find({ _id: { $in: usersId } });
 
       const sortedAvailableUserByEt = availableUser.reduce((pValue, cValue) => {
@@ -84,12 +84,59 @@ exports.addOfficerToEtehadiye = (req, res) => {
       const clearEts = await Promise.all(promises);
 
       await Promise.all(
-        findedEt.officers.map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null }, { new: true }))
+        foundedEt.officers.map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null }, { new: true }))
       );
 
-      await Promise.all(usersId.map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null }, { new: true })));
+      await Promise.all(
+        usersId.map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null }, { new: true }))
+      );
 
       const updatedEt = await Etehadiye.findOneAndUpdate({ _id }, { officers: usersId }, { new: true });
+
+      const updatedUsers = await Promise.all(
+        usersId.map(userId => User.findOneAndUpdate({ _id: userId }, { etOrganization: _id }, { new: true }))
+      );
+
+      return res.json({ etehadiye: updatedEt, users: updatedUsers, updatedEts: clearEts });
+    })
+    .catch(err => res.status(422).send({ error: "we have an issues", err }));
+};
+
+exports.addOrganicLevelToEt = (req, res) => {
+  const { _id, users, level } = req.body;
+  const usersId = users.map(user => user._id);
+
+  Etehadiye.findById(_id)
+    .exec()
+    .then(async foundedEt => {
+      const availableUser = await User.find({ _id: { $in: usersId } });
+
+      const sortedAvailableUserByEt = availableUser.reduce((pValue, cValue) => {
+        if (cValue.etOrganization) {
+          pValue[cValue.etOrganization] = pValue[cValue.etOrganization] || [];
+          pValue[cValue.etOrganization].push(cValue._id);
+        }
+        return pValue;
+      }, {});
+
+      let promises = [];
+
+      for (let key in sortedAvailableUserByEt) {
+        const promise = Etehadiye.findOneAndUpdate(
+          { _id: key },
+          { $pullAll: { [level]: sortedAvailableUserByEt[key] } },
+          { new: true }
+        );
+        promises.push(promise);
+      }
+
+      const clearEts = await Promise.all(promises);
+
+      await Promise.all(foundedEt[level].map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null })));
+
+      await Promise.all(usersId.map(ofId => User.findOneAndUpdate({ _id: ofId }, { etOrganization: null })));
+
+      const updatedEt = await Etehadiye.findOneAndUpdate({ _id }, { [level]: usersId }, { new: true });
 
       const updatedUsers = await Promise.all(
         usersId.map(userId => User.findOneAndUpdate({ _id: userId }, { etOrganization: _id }, { new: true }))

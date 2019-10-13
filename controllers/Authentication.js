@@ -16,11 +16,7 @@ function tok(user) {
 }
 
 exports.loginWithMob = (req, res) => {
-  console.log(
-    "req.body az loginWithMob",
-    req.body,
-    pnumber.toEnglishDigits(req.body.phone)
-  );
+  console.log("req.body az loginWithMob", req.body, pnumber.toEnglishDigits(req.body.phone));
 
   if (!req.body.phone) {
     return res.status(422).send({ error: "you most send your phone number!" });
@@ -66,11 +62,7 @@ exports.loginWithMob = (req, res) => {
         user.authCode = code;
         user.save().then(userSaved1 => {
           codeShomareTimeOut = setTimeout(() => {
-            User.findOneAndUpdate(
-              { _id: user._id },
-              { $set: { authCode: 0 } },
-              { new: true }
-            )
+            User.findOneAndUpdate({ _id: user._id }, { $set: { authCode: 0 } }, { new: true })
               .exec()
               .then(userSaved => {
                 // befrestNotification(req.body.fcmToken, 'زمان تایید شماره به پایان رسید')
@@ -93,11 +85,7 @@ exports.loginWithMob = (req, res) => {
         }
         newUser.save().then(userSavedNew => {
           codeShomareTimeOut = setTimeout(() => {
-            User.findOneAndUpdate(
-              { _id: newUser._id },
-              { $set: { authCode: 0 } },
-              { new: true }
-            )
+            User.findOneAndUpdate({ _id: newUser._id }, { $set: { authCode: 0 } }, { new: true })
               .exec()
               .then(userSaved => {
                 // befrestNotification(req.body.fcmToken, 'زمان تایید شماره به پایان رسید')
@@ -111,7 +99,7 @@ exports.loginWithMob = (req, res) => {
     .catch(err => res.status(422).send({ error: "we have a issue!", err }));
 };
 
-exports.loginWithCaptcha = (req, res, next) => {
+exports.loginWithCaptcha = (req, res) => {
   // console.log('req.body az loginWithMob', req.body)
 
   if (!req.body.phone) {
@@ -159,11 +147,7 @@ exports.loginWithCaptcha = (req, res, next) => {
         user.authCode = code;
         user.save().then(userSaved1 => {
           codeShomareTimeOut = setTimeout(() => {
-            User.findOneAndUpdate(
-              { _id: user._id },
-              { $set: { authCode: 0 } },
-              { new: true }
-            )
+            User.findOneAndUpdate({ _id: user._id }, { $set: { authCode: 0 } }, { new: true })
               .exec()
               .then(userSaved => {
                 // befrestNotification(req.body.fcmToken, 'زمان تایید شماره به پایان رسید')
@@ -186,11 +170,7 @@ exports.loginWithCaptcha = (req, res, next) => {
         }
         newUser.save().then(userSavedNew => {
           codeShomareTimeOut = setTimeout(() => {
-            User.findOneAndUpdate(
-              { _id: newUser._id },
-              { $set: { authCode: 0 } },
-              { new: true }
-            )
+            User.findOneAndUpdate({ _id: newUser._id }, { $set: { authCode: 0 } }, { new: true })
               .exec()
               .then(userSaved => {
                 // befrestNotification(req.body.fcmToken, 'زمان تایید شماره به پایان رسید')
@@ -209,9 +189,7 @@ exports.acceptKey = (req, res) => {
   // console.log("req.body from acceptKey Authentication", req.body);
   // console.log("==================");
   User.findOne({ phone: req.body.phone })
-    .select(
-      "fcmToken authCode phone name familyName etOrganization asOrganization level pic"
-    )
+    .select("fcmToken authCode phone name familyName etOrganization asOrganization level pic")
     .exec()
     .then(userPey => {
       if (req.body.fcmToken !== userPey.fcmToken) {
@@ -282,11 +260,7 @@ exports.removeAddressFromUser = (req, res, next) => {
   // console.log('req.user az removeAddressFromUser', req.user);
   // console.log('req.body az removeAddressFromUser', req.body);
   if (req.user) {
-    User.findOneAndUpdate(
-      { _id: req.user._id },
-      { $pull: { address: { _id: req.body._id } } },
-      { new: true }
-    )
+    User.findOneAndUpdate({ _id: req.user._id }, { $pull: { address: { _id: req.body._id } } }, { new: true })
       .exec()
       .then(updatedUser => res.send({ user: updatedUser }))
       .catch(err => res.status(422).send({ error: "we have a issue!", err }));
@@ -328,9 +302,7 @@ exports.register = (req, res, next) => {
   // phone = pnumber.toEnglishDigits(phone.toString())
 
   if (!email || !password || !phone) {
-    return res
-      .status(422)
-      .send({ error: "you most have at least email password and phone" });
+    return res.status(422).send({ error: "you most have at least email password and phone" });
   }
 
   phone = Tell.phoneMobile(phone);
@@ -363,11 +335,7 @@ exports.register = (req, res, next) => {
               if (req.body.fcmToken) {
                 user.fcmToken = req.body.fcmToken;
               }
-              user
-                .save()
-                .then(userSaved =>
-                  res.json({ token: tok(userSaved), user: userSaved })
-                );
+              user.save().then(userSaved => res.json({ token: tok(userSaved), user: userSaved }));
             }
           });
       }
@@ -397,18 +365,10 @@ exports.register = (req, res, next) => {
 
 exports.users = (req, res) => {
   let query = {};
-  req.query.email
-    ? (query = { ...query, email: { $regex: req.query.email } })
-    : (query = query);
-  req.query.familyName
-    ? (query = { ...query, familyName: { $regex: req.query.familyName } })
-    : (query = query);
-  req.query.phone
-    ? (query = { ...query, $where: `/${req.query.phone}.*/.test(this.phone)` })
-    : (query = query);
-  req.query.level
-    ? (query = { ...query, level: { $all: req.query.level } })
-    : (query = query);
+  req.query.email ? (query = { ...query, email: { $regex: req.query.email } }) : (query = query);
+  req.query.familyName ? (query = { ...query, familyName: { $regex: req.query.familyName } }) : (query = query);
+  req.query.phone ? (query = { ...query, $where: `/${req.query.phone}.*/.test(this.phone)` }) : (query = query);
+  req.query.level ? (query = { ...query, level: { $all: req.query.level } }) : (query = query);
 
   User.find(query)
     .limit(30)
@@ -421,18 +381,10 @@ exports.getUsersWithSearch = (req, res) => {
   // console.log('req.body az bigiKarbarhaBaSearch', req.body)
 
   let query = {};
-  req.body.email
-    ? (query = { ...query, email: { $regex: req.body.email } })
-    : (query = query);
-  req.body.familyName
-    ? (query = { ...query, familyName: { $regex: req.body.familyName } })
-    : (query = query);
-  req.body.phone
-    ? (query = { ...query, $where: `/${req.body.phone}.*/.test(this.phone)` })
-    : (query = query);
-  req.body.level
-    ? (query = { ...query, level: req.body.level })
-    : (query = query);
+  req.body.email ? (query = { ...query, email: { $regex: req.body.email } }) : (query = query);
+  req.body.familyName ? (query = { ...query, familyName: { $regex: req.body.familyName } }) : (query = query);
+  req.body.phone ? (query = { ...query, $where: `/${req.body.phone}.*/.test(this.phone)` }) : (query = query);
+  req.body.level ? (query = { ...query, level: req.body.level }) : (query = query);
 
   User.find(query)
     .limit(50)
@@ -490,18 +442,7 @@ exports.usersCount = async (req, res) => {
 exports.addUser = (req, res) => {
   console.log("req.body addUser Authentication", req.body);
 
-  let {
-    name,
-    familyName,
-    email,
-    expertise,
-    address,
-    password,
-    doctor,
-    level,
-    phone,
-    phoneValidate
-  } = req.body;
+  let { name, familyName, email, expertise, address, password, doctor, level, phone, phoneValidate } = req.body;
   phone = Tell.phoneMobile(phone);
 
   if (phone === "number is not valid") {
@@ -512,17 +453,13 @@ exports.addUser = (req, res) => {
     .exec()
     .then(userFind => {
       if (userFind) {
-        return res
-          .status(409)
-          .send({ error: "this email has token by another" });
+        return res.status(409).send({ error: "this email has token by another" });
       } else {
         User.findOne({ phone: phone })
           .exec()
           .then(userFindByPhone => {
             if (userFindByPhone) {
-              return res
-                .status(409)
-                .send({ error: "this phone number exist in database" });
+              return res.status(409).send({ error: "this phone number exist in database" });
             } else {
               let user = new User({
                 name,
