@@ -24,7 +24,7 @@
     "image-downloader": "^3.4.2",
     "image-size": "^0.7.2",
     "jwt-simple": "^0.5.5",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "mime-types": "^2.1.22",
     "mongoose": "^5.7.5",
     "morgan": "^1.9.1",
